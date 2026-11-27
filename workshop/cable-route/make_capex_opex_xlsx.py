@@ -65,6 +65,67 @@ for row in ws.iter_rows(min_row=4, max_row=last):
     for c in row:
         c.alignment = Alignment(vertical="top", wrap_text=c.column_letter in "AH")
 ws.freeze_panes = "C5"
+
+# --- sheet 2: losses per route ---------------------------------------------------------------
+import json  # noqa: E402
+
+R = json.loads((d / "routes.json").read_text())
+wl = wb.create_sheet("Verluste")
+wl["A1"] = "Netzverluste je Route (2 GW Bipol, 525 kV)"
+wl["A1"].font = Font(bold=True, size=13)
+wl["A2"] = "Rolle 1 · Kabel-Techno-Ökonomie · gelbe Zelle ist eine Eingabe und kann geändert werden"
+wl.append([])
+wl.append(["Kennzahl"] + [n for _, n in CO.ROUTES] + ["Einheit", "Herkunft", "Erläuterung"])
+for c in wl[4]:
+    c.font, c.fill = head, hfill
+keys = [k for k, _ in CO.ROUTES]
+L = [  # (Kennzahl, values or formula template with {c}, unit, Herkunft, Erläuterung, number format)
+    ("Länge", [R[k]["length_km"] for k in keys], "km", "berechnet", "Kostengünstigster Weg auf dem 0,05°-Raster.", "#,##0"),
+    ("Verlust bei Volllast (2 GW)", [R[k]["loss_full_load_pct"] for k in keys], "%", "berechnet",
+     "Gleichstromwiderstand je Tiefenklasse aus den Kabeldaten × Länge, Nennstrom, zwei Kabel; plus Konverter.", "0.0"),
+    ("davon Konverter (2 Stationen)", [1.72] * 3, "%", "direkt", "Konverterverlust je Station laut Kabeldaten, zwei Stationen.", "0.00"),
+    ("davon Kabel", "={c}6-{c}7", "%", "berechnet", "Volllastverlust minus Konverter.", "0.0"),
+    ("Kabelverlust je 1.000 km bei Volllast", "={c}8/{c}5*1000", "%", "berechnet", "Kabelverlust geteilt durch Länge.", "0.00"),
+    ("Verlust bei halber Last (1 GW)", [R[k]["loss_half_load_pct"] for k in keys], "%", "berechnet",
+     "Kabelverlust sinkt mit der Last (Strom halb, Verlust ein Viertel), Konverter bleiben.", "0.0"),
+    ("Ankommende Leistung bei Volllast", "=2000*(1-{c}6/100)", "MW", "berechnet", "2.000 MW gesendet.", "#,##0"),
+    ("Verlustleistung bei Volllast", "=2000*{c}6/100", "MW", "berechnet", "Wärme in Kabel und Konvertern.", "#,##0"),
+    None,
+    ("Eingabe: Auslastung (Anteil von 2 GW)", None, "–", "Annahme", "Frei wählbar, z. B. 0,5 für halbe Last.", "0.00"),
+    ("Verlust bei dieser Auslastung", "={c}7+{c}8*$B$14", "%", "berechnet",
+     "Konverter + Kabelverlust × Auslastung (relativer Kabelverlust ∝ Leistung).", "0.0"),
+    ("Gesendete Leistung", "=2000*$B$14", "MW", "berechnet", "", "#,##0"),
+    ("Ankommende Leistung", "={c}16*(1-{c}15/100)", "MW", "berechnet", "", "#,##0"),
+]
+for i, item in enumerate(L):
+    r = 5 + i
+    if item is None:
+        wl.append([])
+        continue
+    name, vals, unit, hk, note, nf = item
+    if vals is None:  # input row
+        wl.append([name, 1.0, None, None, unit, "zusätzliche Annahme", note])
+        wl[f"B{r}"].fill = PatternFill("solid", fgColor="FFF2B3")
+        wl[f"B{r}"].font = bold
+        wl[f"F{r}"].fill = PatternFill("solid", fgColor=HK_FILL["berechnet + Annahme"])
+        wl[f"B{r}"].number_format = nf
+        continue
+    cells = [v.format(c=col) for v, col in zip([vals] * 3, "BCD")] if isinstance(vals, str) else vals
+    wl.append([name, *cells, unit, HK_TEXT[hk], note])
+    wl[f"F{r}"].fill = PatternFill("solid", fgColor=HK_FILL[hk])
+    for col in "BCD":
+        wl[f"{col}{r}"].number_format = nf
+wl.append([])
+wl.append(["Der Widerstand gilt bei maximaler Leitertemperatur; im Betrieb ist das Kabel oft kühler, die Verluste "
+           "also eher etwas niedriger (Annahme)."])
+wl.append(["Verluste sind nicht in € bewertet: Im PyPSA-Modell stecken sie im Wirkungsgrad der Verbindung "
+           "(Wirkungsgrad = 1 − Verlust)."])
+for col, w in zip("ABCDEFG", [40, 24, 26, 22, 9, 34, 80]):
+    wl.column_dimensions[col].width = w
+for row in wl.iter_rows(min_row=5, max_row=17):
+    for c in row:
+        c.alignment = Alignment(vertical="top", wrap_text=c.column_letter in "AG")
+wl.freeze_panes = "B5"
 out = d / "capex_opex.xlsx"
 wb.save(out)
 print(f"-> {out}")
