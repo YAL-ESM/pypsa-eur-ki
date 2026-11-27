@@ -121,6 +121,83 @@ slides.append(f"""
   </div>
 </section>""")
 
+# 3b cost breakdown and corridor (rounded aggregates only, no supplier prices)
+COST_ROWS = [
+    ["Kabel: Lieferung", "≈ 80 %", "≈ 80 %", "≈ 75 %"],
+    ["Reserve (in den Daten enthalten)", "≈ 15 %", "≈ 15 %", "≈ 15 %"],
+    ["Eingraben auf dem Schelf", "≈ 4 %", "≈ 5 %", "≈ 4 %"],
+    ["Verlegung", "≈ 1 %", "≈ 1 %", "≈ 1 %"],
+    ["Konverter, Muffen, Anlandung", "≈ 2 %", "≈ 2 %", "≈ 2 %"],
+    ["davon Abschnitte &gt; 3.000 m", "≈ 35 %", "≈ 30 %", "<b>≈ 45 %</b>"],
+]
+CORRIDOR = [  # Mrd. EUR: favourable, base (routes.json), unfavourable
+    ("A", 60, A, 93), ("B", 61, B, 94), ("C", 61, C, 98)]
+crow = "".join(f"<tr><td><b>{a}</b></td><td>{b}</td><td>{c}</td><td>{e}</td></tr>" for a, b, c, e in COST_ROWS)
+corr = "".join(f"<tr><td><b>{n}</b></td><td class='r'>≈ {lo}</td><td class='r'><b>{de(r['total_bn'],1)}</b></td>"
+               f"<td class='r'>≈ {hi}</td><td class='r'>+{de(100*(hi/r['total_bn']-1))} %</td></tr>" for n, lo, r, hi in CORRIDOR)
+slides.append(f"""
+<section class="dense">
+  <h2>Woher die Kosten kommen und wie unsicher sie sind (2 GW)</h2>
+  <div class="cols">
+  <div>
+  <p><b>Anteile an der Investition</b>, gerundet [D]</p>
+  <table class="mid"><tr><th>Kostenart</th><th>A · Touros</th><th>B · Touros flach</th><th>C · Pecém</th></tr>{crow}</table>
+  <ul>
+    <li>Fast alles ist <b>Kabellieferung</b>. Verlegung und Konverter sind kaum ein Hebel. [D]</li>
+    <li>Der größte Block sind die Abschnitte über 3.000 m, für die es nur eine Designstudie gibt. [D]</li>
+  </ul>
+  </div>
+  <div>
+  <p><b>Kostenkorridor</b> in Mrd. € [A, Basis D]</p>
+  <table class="mid"><tr><th>Route</th><th class="r">günstig</th><th class="r">Basis</th><th class="r">ungünstig</th><th class="r">Aufschlag</th></tr>{corr}</table>
+  <table class="mid" style="margin-top:10px"><tr><th>Annahme je Teil [A]</th><th class="r">günstig</th><th class="r">ungünstig</th></tr>
+    <tr><td>Kabel bis 1.500 m, im Betrieb erprobt</td><td class="r">−10 %</td><td class="r">+20 %</td></tr>
+    <tr><td>Kabel 1.500–3.000 m, typgeprüft</td><td class="r">−10 %</td><td class="r">+35 %</td></tr>
+    <tr><td>Kabel &gt; 3.000 m, nur Designstudie</td><td class="r">−15 %</td><td class="r">+60 %</td></tr>
+    <tr><td>Konverter, Muffen, Anlandung</td><td class="r">−10 %</td><td class="r">+30 %</td></tr>
+  </table>
+  <p class="note"><b>Ungünstiger Fall ≈ +35–40 %, also 93–98 Mrd. €.</b> Route C trifft es am stärksten, weil fast die Hälfte
+     ihrer Kosten über 3.000 m liegt. [A] Die Spanne liegt im üblichen Rahmen einer Schätzung in der Machbarkeitsphase. [A]
+     Die Reserve von ≈ 15 % ist schon in der Basis enthalten. [D] Nicht enthalten: Bauzinsen über ≈ 6 Jahre,
+     Preissteigerung ab 2025, Netzanschluss an Land in Deutschland. [D]</p>
+  </div>
+  </div>
+</section>""")
+
+# 3c repairs (rounded annual aggregates only)
+REP = [  # route, repair campaigns M EUR/a, lost revenue M EUR/a, 40-year total bn EUR
+    ("A", A, 12, 37, "1,9"), ("B", B, 13, 39, "2,1"), ("C", C, 11, 34, "1,8")]
+rrow = lambda lab, f: f"<tr><td>{lab}</td>" + "".join(f"<td class='r'>{f(x)}</td>" for x in REP) + "</tr>"
+slides.append(f"""
+<section class="dense">
+  <h2>Reparaturen: wie oft und was sie kosten (2 GW)</h2>
+  <div class="cols">
+  <div>
+  <table class="mid"><tr><th>[D]</th><th class="r">A · Touros</th><th class="r">B · Touros flach</th><th class="r">C · Pecém</th></tr>
+    {rrow("Fehler pro Jahr", lambda x: de(x[1]['faults_per_year'],1))}
+    {rrow("Fehler in 40 Jahren", lambda x: '≈ ' + de(40*x[1]['faults_per_year']))}
+    {rrow("Tage/Jahr mit halber Leistung", lambda x: '≈ ' + de(x[1]['half_power_days_per_year']))}
+    {rrow("Reparatureinsätze", lambda x: f'≈ {x[2]} Mio. €/Jahr')}
+    {rrow("Erlösausfall", lambda x: f'≈ {x[3]} Mio. €/Jahr')}
+    <tr class="hl"><td><b>Summe</b></td>{''.join(f"<td class='r'><b>≈ {x[2]+x[3]} Mio. €/Jahr</b></td>" for x in REP)}</tr>
+    {rrow("über 40 Jahre, nicht abgezinst", lambda x: f'≈ {x[4]} Mrd. €')}
+  </table>
+  <p class="note">Gerundete Jahreswerte. Fehlerraten und Reparaturdauer je Tiefenklasse aus den Kabeldaten.</p>
+  </div>
+  <div>
+  <ul>
+    <li><b>Etwa ein Fehler pro Jahr.</b> Pro km fällt das Kabel im Flachwasser deutlich häufiger aus als in der Tiefsee,
+        die Reparatur in der Tiefsee dauert aber Monate statt Wochen. [D]</li>
+    <li><b>Der Erlösausfall wiegt schwerer als die Reparatur.</b> Mit einem Pol kommen ≈ 0,65 GW an, der Vertrag verlangt
+        im Mittel ≈ 1,06 GW (9,25 TWh/Jahr). Es fehlen ≈ 0,5 TWh/Jahr (≈ 6 %), bewertet mit 68,4 €/MWh. [D]</li>
+    <li>Das liegt unter der Schwelle von 15 % Fehlmenge, ab der Ausgleich fällig wird. [D]</li>
+    <li>Nicht enthalten: laufende Wartung, Ersatzkabel auf Lager, ein reserviertes Reparaturschiff. [D]
+        Fallen im Bündel beide Pole aus (z. B. Anker), steht die ganze Leistung still. [A]</li>
+  </ul>
+  </div>
+  </div>
+</section>""")
+
 for ps in P["slides"]:
     trs = "".join(f"<tr><td><b>{a}</b></td><td>{b}</td><td>{c}</td></tr>" for a, b, c in ps["rows"])
     slides.append(f"""

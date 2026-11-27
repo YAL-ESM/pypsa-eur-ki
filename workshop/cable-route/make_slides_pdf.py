@@ -30,7 +30,7 @@ land = {"cost_Touros": "Touros/Natal", "cost_Pecem": "Pecém", "cost_SaoLuis": "
 tots = [R[k]["total_bn"] for k in land]
 A, B, C = R["cost_Touros"], R["shallow"], R["cost_Pecem"]
 P = json.loads((d / "problems.json").read_text())
-N_SLIDES = 14 + len(P["slides"])
+N_SLIDES = 16 + len(P["slides"])
 LEGEND = ("[D] = aus den Workshop-Daten oder daraus berechnet   ·   "
           "[A] = allgemeines Fachwissen, nicht durch die Daten im Repo belegt")
 
@@ -185,6 +185,67 @@ with PdfPages(d / "slides.pdf") as pdf:
          "nur bei Anlandung in Pecém; höchstes Tiefenrisiko"],
     ], size=10, hl_rows=(10,), bold_cells={(8, 0), (9, 0), (10, 0), (10, 2)})
     s.text(5.75, y, "Alle Werte für 2 GW (Bipol, 525 kV, zwei Kabel mit je ≈ 1 GW). Anlandepunkte sind Beispiele. [D]", 10, 7.4, INK2)
+    s.save()
+
+    # 3b cost breakdown and corridor (rounded aggregates only, no supplier prices)
+    s = Slide(pdf, None, "Woher die Kosten kommen und wie unsicher sie sind (2 GW)")
+    s.text(0.65, 1.25, "Anteile an der Investition, gerundet [D]", 12.5, 6, weight="bold")
+    y = s.table(0.65, 1.6, [2.6, 1.15, 1.25, 1.1], [
+        ["Kostenart", "A · Touros", "B · Touros flach", "C · Pecém"],
+        ["Kabel: Lieferung", "≈ 80 %", "≈ 80 %", "≈ 75 %"],
+        ["Reserve (in den Daten enthalten)", "≈ 15 %", "≈ 15 %", "≈ 15 %"],
+        ["Eingraben auf dem Schelf", "≈ 4 %", "≈ 5 %", "≈ 4 %"],
+        ["Verlegung", "≈ 1 %", "≈ 1 %", "≈ 1 %"],
+        ["Konverter, Muffen, Anlandung", "≈ 2 %", "≈ 2 %", "≈ 2 %"],
+        ["davon Abschnitte > 3.000 m", "≈ 35 %", "≈ 30 %", "≈ 45 %"],
+    ], size=11, bold_cells={(i, 0) for i in range(1, 7)} | {(6, 3)})
+    s.bullets(0.65, y + 0.15, [
+        "Fast alles ist Kabellieferung. Verlegung und Konverter sind kaum ein Hebel. [D]",
+        "Der größte Block sind die Abschnitte über 3.000 m, für die es nur eine Designstudie gibt. [D]",
+    ], size=12.5, width=6.1, gap=0.12)
+    s.text(7.1, 1.25, "Kostenkorridor in Mrd. € [A, Basis D]", 12.5, 6, weight="bold")
+    CORR = [("A", 60, A, 93), ("B", 61, B, 94), ("C", 61, C, 98)]
+    y = s.table(7.1, 1.6, [0.9, 1.15, 1.15, 1.3, 1.25],
+                [["Route", "günstig", "Basis", "ungünstig", "Aufschlag"]] +
+                [[n, f"≈ {lo}", de(r["total_bn"], 1), f"≈ {hi}", f"+{de(100*(hi/r['total_bn']-1))} %"] for n, lo, r, hi in CORR],
+                size=11, right=(1, 2, 3, 4), bold_cells={(i, 0) for i in range(1, 4)} | {(i, 2) for i in range(1, 4)})
+    y = s.table(7.1, y + 0.05, [3.55, 1.1, 1.1], [
+        ["Annahme je Teil [A]", "günstig", "ungünstig"],
+        ["Kabel bis 1.500 m, im Betrieb erprobt", "−10 %", "+20 %"],
+        ["Kabel 1.500–3.000 m, typgeprüft", "−10 %", "+35 %"],
+        ["Kabel > 3.000 m, nur Designstudie", "−15 %", "+60 %"],
+        ["Konverter, Muffen, Anlandung", "−10 %", "+30 %"],
+    ], size=10.5, right=(1, 2))
+    y = s.text(7.1, y + 0.05, "Ungünstiger Fall ≈ +35–40 %, also 93–98 Mrd. €.", 11, 5.8, weight="bold")
+    s.text(7.1, y, "Route C trifft es am stärksten, weil fast die Hälfte ihrer Kosten über 3.000 m liegt. [A] "
+                   "Die Spanne liegt im üblichen Rahmen einer Schätzung in der Machbarkeitsphase. [A] Die Reserve von ≈ 15 % "
+                   "ist schon in der Basis enthalten. [D] Nicht enthalten: Bauzinsen über ≈ 6 Jahre, Preissteigerung ab 2025, "
+                   "Netzanschluss an Land in Deutschland. [D]", 10, 5.8, INK2)
+    s.save()
+
+    # 3c repairs (rounded annual aggregates only)
+    s = Slide(pdf, None, "Reparaturen: wie oft und was sie kosten (2 GW)")
+    REP = [(A, 12, 37, "1,9"), (B, 13, 39, "2,1"), (C, 11, 34, "1,8")]
+    y = s.table(0.65, 1.35, [2.5, 1.35, 1.35, 1.35], [
+        ["[D]", "A · Touros", "B · Touros flach", "C · Pecém"],
+        ["Fehler pro Jahr", *[de(r["faults_per_year"], 1) for r, *_ in REP]],
+        ["Fehler in 40 Jahren", *[f"≈ {de(40*r['faults_per_year'])}" for r, *_ in REP]],
+        ["Tage/Jahr mit halber Leistung", *[f"≈ {de(r['half_power_days_per_year'])}" for r, *_ in REP]],
+        ["Reparatureinsätze", *[f"≈ {a} Mio. €/Jahr" for _, a, _b, _c in REP]],
+        ["Erlösausfall", *[f"≈ {b} Mio. €/Jahr" for _, _a, b, _c in REP]],
+        ["Summe", *[f"≈ {a+b} Mio. €/Jahr" for _, a, b, _c in REP]],
+        ["über 40 Jahre, nicht abgezinst", *[f"≈ {c} Mrd. €" for *_, c in REP]],
+    ], size=11.5, right=(1, 2, 3), hl_rows=(6,), bold_cells={(6, k) for k in range(4)})
+    s.text(0.65, y + 0.05, "Gerundete Jahreswerte. Fehlerraten und Reparaturdauer je Tiefenklasse aus den Kabeldaten.", 10, 6.5, INK2)
+    s.bullets(7.5, 1.4, [
+        "Etwa ein Fehler pro Jahr. Pro km fällt das Kabel im Flachwasser deutlich häufiger aus als in der Tiefsee, "
+        "die Reparatur in der Tiefsee dauert aber Monate statt Wochen. [D]",
+        "Der Erlösausfall wiegt schwerer als die Reparatur. Mit einem Pol kommen ≈ 0,65 GW an, der Vertrag verlangt im "
+        "Mittel ≈ 1,06 GW (9,25 TWh/Jahr). Es fehlen ≈ 0,5 TWh/Jahr (≈ 6 %), bewertet mit 68,4 €/MWh. [D]",
+        "Das liegt unter der Schwelle von 15 % Fehlmenge, ab der Ausgleich fällig wird. [D]",
+        "Nicht enthalten: laufende Wartung, Ersatzkabel auf Lager, ein reserviertes Reparaturschiff. [D] "
+        "Fallen im Bündel beide Pole aus (z. B. Anker), steht die ganze Leistung still. [A]",
+    ], size=13, width=5.3, gap=0.2)
     s.save()
 
     # implementation factors (problems.json)
