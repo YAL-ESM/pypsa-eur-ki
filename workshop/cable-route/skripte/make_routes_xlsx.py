@@ -4,6 +4,7 @@ Rounded aggregates from routes.json only (no supplier unit prices).
 Usage: python make_routes_xlsx.py <cable-route dir>
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -16,6 +17,18 @@ KEYS = [("cost_Macau", "A · kostenminimal"), ("shallow", "B · geringste Maxima
         ("minabyss", "C · wenigste km tiefer als 3.000 m")]
 A, B, C = (R[k] for k, _ in KEYS)
 SHORT = R["short"]
+REPO = d.resolve().parents[1]
+
+
+def landing_br():
+    """Landing A (with connection costs) from role 2's file: (lat, lon)."""
+    txt = (REPO / "workshop" / "brazil" / "landing_location.txt").read_text().split("A) With connection costs", 1)[1]
+    lat = float(re.search(r"Latitude:\s*(-?[\d.]+)", txt).group(1))
+    lon = float(re.search(r"Longitude:\s*(-?[\d.]+)", txt).group(1))
+    return lat, lon
+
+
+DE = (53.85, 7.90)  # end point in the German Bight, as in routes.py
 
 
 def de(x, nd=0):
@@ -62,6 +75,18 @@ ws.append([])
 ws.append(["Kennzahl"] + [n for _, n in KEYS] + ["Einheit", "Herkunft"])
 for c in ws[4]:
     c.font, c.fill = head, hfill
+def deg(lat, lon):
+    return (f"{de(abs(lat), 2)}° {'S' if lat < 0 else 'N'}, {de(abs(lon), 2)}° {'W' if lon < 0 else 'O'}")
+
+
+br = landing_br()
+LANDING = [
+    ("Anlandepunkt Brasilien", f"Macau/Guamaré (RN), {deg(*br)}", "Rolle 2 (landing_location.txt, Punkt A)"),
+    ("Anlandepunkt Deutschland", f"Deutsche Bucht, {deg(*DE)} (pauschal)", "Annahme; Netzknoten mit Rolle 3 offen"),
+]
+for name, val, hk in LANDING:
+    ws.append([name, val, val, val, "", hk])
+    ws[f"A{ws.max_row}"].font = bold
 for name, vals, unit, nf, hk in ROWS:
     ws.append([name, *vals, unit, "aus den Daten berechnet"])
     r = ws.max_row
@@ -81,7 +106,8 @@ ws.append([])
 notes = [
     f"Verworfen: die kürzeste Route ({de(SHORT['length_km'])} km, {de(SHORT['total_bn'], 1)} Mrd. €, "
     f"{de(SHORT['km']['abyssal'])} km tiefer als 3.000 m, max. {de(SHORT['max_depth_m'])} m).",
-    "Anlandung Brasilien: workshop/brazil/landing_location.txt (Rolle 2). Routen: kostengünstigster Weg auf einem "
+    "Anlandung Brasilien: workshop/brazil/landing_location.txt (Rolle 2), Punkt A mit Anschlusskosten. Punkt B "
+    "liegt ≈ 22 km daneben und ändert die Routen praktisch nicht. Alle drei Routen haben dieselben Endpunkte. Routen: kostengünstigster Weg auf einem "
     "0,05°-Raster (GEBCO 2025); B mit Tiefengrenze ≈ 4.580 m, C zählt Strecken über 3.000 m vierfach.",
     "Quelle der Kennzahlen: workshop/cable-route/skripte/routes.json, erzeugt von routes.py mit den Kabeldaten. "
     "Bisher sind Kabel bis 2.150 m verlegt und bis 3.000 m typgeprüft; jede Route reicht tiefer.",
