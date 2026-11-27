@@ -147,12 +147,12 @@ with PdfPages(d / "slides.pdf") as pdf:
     s = Slide(pdf, 3, "Die größten Risiken")
     RISKS = [
         ["Tiefe über 3.000 m", "Für 3.000–6.000 m gibt es nur eine Designstudie; jede Route reicht tiefer. [D]",
-         "Qualifizierung für ≈ 4.500 m (Zuschuss in Aussicht); flachste Route B. [D]"],
+         "Qualifizierung für ≈ 4.500 m; flachste Route B. [D]"],
         ["Kosten und Finanzierung", f"{de(min(tots),1)}–{de(max(tots),1)} Mrd. € Investition für Kabel und Konverter. [D]",
-         "Staatliche Kreditgarantie und Zuschüsse [D]; geringere Leistung oder Bau in Stufen. [A]"],
+         "Öffentliche Förderung und Garantien prüfen; geringere Leistung oder Bau in Stufen. [A]"],
         ["Verluste", "≈ 35 % bei Volllast, ≈ 18 % bei halber Last. [D]",
          "Höhere Spannung oder größerer Querschnitt [A]; Teillastbetrieb. [D]"],
-        ["Bauzeit und Verzug", "Gut 6 Jahre mit einem Schiff; bei mehr als 30 Monaten Verzug kann der Abnehmer aussteigen. [D] "
+        ["Bauzeit und Verzug", "Gut 6 Jahre mit einem Schiff; ein längerer Verzug gefährdet die Abnahme. [D] "
          "Schiffe und Fertigung sind knapp. [A]",
          "Mehrere Schiffe, Bau in Abschnitten, Kapazitäten früh sichern. [A]"],
         ["Schäden und Reparaturen", "≈ 55 Tage/Jahr mit halber Leistung. [D] Anker und Fischerei im Flachwasser, "
@@ -221,30 +221,27 @@ with PdfPages(d / "slides.pdf") as pdf:
     y = s.text(7.1, y + 0.05, "Ungünstiger Fall ≈ +35–40 %, also 93–98 Mrd. €.", 11, 5.8, weight="bold")
     s.text(7.1, y, "Route C trifft es am stärksten, weil fast die Hälfte ihrer Kosten über 3.000 m liegt. [A] "
                    "Die Spanne liegt im üblichen Rahmen einer Schätzung in der Machbarkeitsphase. [A] Die Reserve von ≈ 15 % "
-                   "ist schon in der Basis enthalten. [D] Nicht enthalten: Bauzinsen über ≈ 6 Jahre, Preissteigerung ab 2025, "
+                   "ist schon in der Basis enthalten. [D] Nicht enthalten: Finanzierungskosten während der Bauzeit, Preissteigerung ab 2025, "
                    "Netzanschluss an Land in Deutschland. [D]", 10, 5.8, INK2)
     s.save()
 
     # 3c repairs (rounded annual aggregates only)
     s = Slide(pdf, None, "Reparaturen: wie oft und was sie kosten (2 GW)")
-    REP = [(A, 12, 37, "1,9"), (B, 13, 39, "2,1"), (C, 11, 34, "1,8")]
+    REP = [(A, 12, "0,5"), (B, 13, "0,5"), (C, 11, "0,4")]
     y = s.table(0.65, 1.35, [2.5, 1.35, 1.35, 1.35], [
         ["[D]", "A · Touros", "B · Touros flach", "C · Pecém"],
         ["Fehler pro Jahr", *[de(r["faults_per_year"], 1) for r, *_ in REP]],
         ["Fehler in 40 Jahren", *[f"≈ {de(40*r['faults_per_year'])}" for r, *_ in REP]],
         ["Tage/Jahr mit halber Leistung", *[f"≈ {de(r['half_power_days_per_year'])}" for r, *_ in REP]],
-        ["Reparatureinsätze", *[f"≈ {a} Mio. €/Jahr" for _, a, _b, _c in REP]],
-        ["Erlösausfall", *[f"≈ {b} Mio. €/Jahr" for _, _a, b, _c in REP]],
-        ["Summe", *[f"≈ {a+b} Mio. €/Jahr" for _, a, b, _c in REP]],
-        ["über 40 Jahre, nicht abgezinst", *[f"≈ {c} Mrd. €" for *_, c in REP]],
-    ], size=11.5, right=(1, 2, 3), hl_rows=(6,), bold_cells={(6, k) for k in range(4)})
+        ["Reparatureinsätze", *[f"≈ {a} Mio. €/Jahr" for _, a, _c in REP]],
+        ["Reparatureinsätze über 40 Jahre, nicht abgezinst", *[f"≈ {c} Mrd. €" for *_, c in REP]],
+    ], size=11.5, right=(1, 2, 3))
     s.text(0.65, y + 0.05, "Gerundete Jahreswerte. Fehlerraten und Reparaturdauer je Tiefenklasse aus den Kabeldaten.", 10, 6.5, INK2)
     s.bullets(7.5, 1.4, [
         "Etwa ein Fehler pro Jahr. Pro km fällt das Kabel im Flachwasser deutlich häufiger aus als in der Tiefsee, "
         "die Reparatur in der Tiefsee dauert aber Monate statt Wochen. [D]",
-        "Der Erlösausfall wiegt schwerer als die Reparatur. Mit einem Pol kommen ≈ 0,65 GW an, der Vertrag verlangt im "
-        "Mittel ≈ 1,06 GW (9,25 TWh/Jahr). Es fehlen ≈ 0,5 TWh/Jahr (≈ 6 %), bewertet mit 68,4 €/MWh. [D]",
-        "Das liegt unter der Schwelle von 15 % Fehlmenge, ab der Ausgleich fällig wird. [D]",
+        "Die Reparaturen selbst sind ein kleiner Posten. Gewichtiger ist der Strom, der bei halber Leistung fehlt; "
+        "dieser Erlösausfall ist hier nicht in € bewertet. [A]",
         "Nicht enthalten: laufende Wartung, Ersatzkabel auf Lager, ein reserviertes Reparaturschiff. [D] "
         "Fallen im Bündel beide Pole aus (z. B. Anker), steht die ganze Leistung still. [A]",
     ], size=13, width=5.3, gap=0.2)
@@ -253,7 +250,7 @@ with PdfPages(d / "slides.pdf") as pdf:
     # 3d CAPEX / OPEX with provenance
     s = Slide(pdf, None, "CAPEX und OPEX der drei Routen (2 GW, Preisbasis 2025)")
     HK = {"direkt": "direkt aus den Daten", "berechnet": "aus den Daten berechnet", "berechnet + Annahme": "berechnet, mit Annahme"}
-    fmt = lambda v, u: de(v, 1) if u in ("Mrd. €", "TWh/Jahr") else (str(v) if u == "Jahr" else de(v))
+    fmt = lambda v, u: de(v, 1) if u == "Mrd. €" else (str(v) if u == "Jahr" else de(v))
     CR = CO.rows(d)
     y = s.table(0.5, 1.25, [4.1, 0.95, 1.2, 1.4, 1.2, 1.35, 2.1],
                 [["Posten", "Art", "A · Touros", "B · Touros flach", "C · Pecém", "Einheit", "Herkunft"]] +

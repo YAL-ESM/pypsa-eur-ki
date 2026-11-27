@@ -72,12 +72,12 @@ slides.append(f"""
 # 2 biggest risks
 RISKS = [
     ["Tiefe über 3.000 m", "Für 3.000–6.000 m gibt es nur eine Designstudie; jede Route reicht tiefer. [D]",
-     "Qualifizierung für ≈ 4.500 m (Zuschuss in Aussicht); flachste Route B. [D]"],
+     "Qualifizierung für ≈ 4.500 m; flachste Route B. [D]"],
     ["Kosten und Finanzierung", f"{de(min(tots),1)}–{de(max(tots),1)} Mrd. € Investition für Kabel und Konverter. [D]",
-     "Staatliche Kreditgarantie und Zuschüsse [D]; geringere Leistung oder Bau in Stufen. [A]"],
+     "Öffentliche Förderung und Garantien prüfen; geringere Leistung oder Bau in Stufen. [A]"],
     ["Verluste", "≈ 35 % bei Volllast, ≈ 18 % bei halber Last. [D]",
      "Höhere Spannung oder größerer Querschnitt [A]; Teillastbetrieb. [D]"],
-    ["Bauzeit und Verzug", "Gut 6 Jahre mit einem Schiff; bei mehr als 30 Monaten Verzug kann der Abnehmer aussteigen. [D] "
+    ["Bauzeit und Verzug", "Gut 6 Jahre mit einem Schiff; ein längerer Verzug gefährdet die Abnahme. [D] "
      "Schiffe und Fertigung sind knapp. [A]",
      "Mehrere Schiffe, Bau in Abschnitten, Kapazitäten früh sichern. [A]"],
     ["Schäden und Reparaturen", "≈ 55 Tage/Jahr mit halber Leistung. [D] Anker und Fischerei im Flachwasser, "
@@ -160,15 +160,15 @@ slides.append(f"""
   </table>
   <p class="note"><b>Ungünstiger Fall ≈ +35–40 %, also 93–98 Mrd. €.</b> Route C trifft es am stärksten, weil fast die Hälfte
      ihrer Kosten über 3.000 m liegt. [A] Die Spanne liegt im üblichen Rahmen einer Schätzung in der Machbarkeitsphase. [A]
-     Die Reserve von ≈ 15 % ist schon in der Basis enthalten. [D] Nicht enthalten: Bauzinsen über ≈ 6 Jahre,
+     Die Reserve von ≈ 15 % ist schon in der Basis enthalten. [D] Nicht enthalten: Finanzierungskosten während der Bauzeit,
      Preissteigerung ab 2025, Netzanschluss an Land in Deutschland. [D]</p>
   </div>
   </div>
 </section>""")
 
 # 3c repairs (rounded annual aggregates only)
-REP = [  # route, repair campaigns M EUR/a, lost revenue M EUR/a, 40-year total bn EUR
-    ("A", A, 12, 37, "1,9"), ("B", B, 13, 39, "2,1"), ("C", C, 11, 34, "1,8")]
+REP = [  # route, repair campaigns M EUR/a, 40-year total bn EUR
+    ("A", A, 12, "0,5"), ("B", B, 13, "0,5"), ("C", C, 11, "0,4")]
 rrow = lambda lab, f: f"<tr><td>{lab}</td>" + "".join(f"<td class='r'>{f(x)}</td>" for x in REP) + "</tr>"
 slides.append(f"""
 <section class="dense">
@@ -180,9 +180,7 @@ slides.append(f"""
     {rrow("Fehler in 40 Jahren", lambda x: '≈ ' + de(40*x[1]['faults_per_year']))}
     {rrow("Tage/Jahr mit halber Leistung", lambda x: '≈ ' + de(x[1]['half_power_days_per_year']))}
     {rrow("Reparatureinsätze", lambda x: f'≈ {x[2]} Mio. €/Jahr')}
-    {rrow("Erlösausfall", lambda x: f'≈ {x[3]} Mio. €/Jahr')}
-    <tr class="hl"><td><b>Summe</b></td>{''.join(f"<td class='r'><b>≈ {x[2]+x[3]} Mio. €/Jahr</b></td>" for x in REP)}</tr>
-    {rrow("über 40 Jahre, nicht abgezinst", lambda x: f'≈ {x[4]} Mrd. €')}
+    {rrow("Reparatureinsätze über 40 Jahre, nicht abgezinst", lambda x: f'≈ {x[3]} Mrd. €')}
   </table>
   <p class="note">Gerundete Jahreswerte. Fehlerraten und Reparaturdauer je Tiefenklasse aus den Kabeldaten.</p>
   </div>
@@ -190,9 +188,8 @@ slides.append(f"""
   <ul>
     <li><b>Etwa ein Fehler pro Jahr.</b> Pro km fällt das Kabel im Flachwasser deutlich häufiger aus als in der Tiefsee,
         die Reparatur in der Tiefsee dauert aber Monate statt Wochen. [D]</li>
-    <li><b>Der Erlösausfall wiegt schwerer als die Reparatur.</b> Mit einem Pol kommen ≈ 0,65 GW an, der Vertrag verlangt
-        im Mittel ≈ 1,06 GW (9,25 TWh/Jahr). Es fehlen ≈ 0,5 TWh/Jahr (≈ 6 %), bewertet mit 68,4 €/MWh. [D]</li>
-    <li>Das liegt unter der Schwelle von 15 % Fehlmenge, ab der Ausgleich fällig wird. [D]</li>
+    <li>Die Reparaturen selbst sind ein kleiner Posten. Gewichtiger ist der <b>Strom, der bei halber Leistung fehlt</b>;
+        dieser Erlösausfall ist hier nicht in € bewertet. [A]</li>
     <li>Nicht enthalten: laufende Wartung, Ersatzkabel auf Lager, ein reserviertes Reparaturschiff. [D]
         Fallen im Bündel beide Pole aus (z. B. Anker), steht die ganze Leistung still. [A]</li>
   </ul>
@@ -204,7 +201,7 @@ slides.append(f"""
 HK = {"direkt": "direkt aus den Daten", "berechnet": "aus den Daten berechnet",
       "berechnet + Annahme": "berechnet, mit Annahme"}
 HKC = {"direkt": "d", "berechnet": "b", "berechnet + Annahme": "a"}
-fmt = lambda v, u: de(v, 1) if u in ("Mrd. €", "TWh/Jahr") else (str(v) if u == "Jahr" else de(v))
+fmt = lambda v, u: de(v, 1) if u == "Mrd. €" else (str(v) if u == "Jahr" else de(v))
 corows = ""
 for name, art, unit, vals, hk, _ in CO.rows(d):
     cls_ = ' class="hl"' if name == "OPEX gesamt" else ""

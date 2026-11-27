@@ -11,7 +11,6 @@ ROUTES = [("cost_Touros", "A · Touros, kostenminimal"), ("shallow", "B · Touro
           ("cost_Pecem", "C · Pecém, kürzeste")]
 FOM = {"cost_Touros": 250, "shallow": 250, "cost_Pecem": 250}      # Mio. EUR/a, rounded
 REPAIR = {"cost_Touros": 12, "shallow": 13, "cost_Pecem": 11}      # Mio. EUR/a, rounded
-LOSS_TWH = {"cost_Touros": 3.2, "shallow": 3.3, "cost_Pecem": 3.0}  # TWh/a at 9.25 TWh delivered
 LIFE = 40
 
 
@@ -33,14 +32,14 @@ def rows(d):
         (f"OPEX über {LIFE} Jahre, nicht abgezinst", "OPEX", "Mrd. €", [round(o * LIFE / 1000, 1) for o in opex],
          "berechnet", f"Lebensdauer {LIFE} Jahre laut Kabeldaten."),
         ("Lebensdauer Kabel und Konverter", "Kennzahl", "Jahre", [LIFE] * 3, "direkt", "Kabeldaten."),
-        ("Preisbasis", "Kennzahl", "Jahr", [2025] * 3, "direkt", "Kabeldaten und Term Sheet."),
-        ("Verluste bei 9,25 TWh/Jahr Lieferung", "Kennzahl", "TWh/Jahr", [LOSS_TWH[k] for k, _ in ROUTES],
-         "berechnet + Annahme", "Leiterwiderstand und Konverterverluste aus den Kabeldaten. Annahme: Das Kabel überträgt genau die "
-         "Liefermenge laut Term Sheet, gleichmäßig über das Jahr. Nicht in € bewertet: im Modell über den Wirkungsgrad erfasst."),
+        ("Preisbasis", "Kennzahl", "Jahr", [2025] * 3, "direkt", "Kabeldaten."),
+        ("Verluste bei Volllast", "Kennzahl", "%", [round(x["loss_full_load_pct"]) for x in r],
+         "berechnet", "Leiterwiderstand und Konverterverluste aus den Kabeldaten. Bei halber Last etwa halb so hoch. "
+         "Nicht in € bewertet: im Modell über den Wirkungsgrad erfasst."),
         ("Tage mit halber Leistung", "Kennzahl", "Tage/Jahr", [round(x["half_power_days_per_year"]) for x in r],
          "berechnet", "Fehlerrate × Reparaturdauer je Tiefenklasse aus den Kabeldaten."),
     ]
 
 
-NOT_INCLUDED = ("Nicht enthalten: Bauzinsen über ≈ 6 Jahre, Preissteigerung ab 2025, Netzanschluss an Land in "
+NOT_INCLUDED = ("Nicht enthalten: Finanzierungskosten während der Bauzeit, Preissteigerung ab 2025, Netzanschluss an Land in "
                 "Deutschland, Erlösausfall bei Reparaturen (Umsatz, keine Kosten).")

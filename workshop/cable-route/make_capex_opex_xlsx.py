@@ -46,7 +46,7 @@ for i, (name, art, unit, vals, hk, note) in enumerate(rows):
         for c in ws[r][:5]:
             c.font = bold
     for col in "CDE":
-        ws[f"{col}{r}"].number_format = "0.0" if unit in ("Mrd. €", "TWh/Jahr") else "0"
+        ws[f"{col}{r}"].number_format = "0.0" if unit == "Mrd. €" else "0"
 last = first + len(rows) - 1
 ws.append([])
 ws.append([CO.NOT_INCLUDED])
@@ -56,8 +56,7 @@ ws[f"A{ws.max_row}"].font = bold
 for k, v in HK_TEXT.items():
     ws.append([v])
     ws[f"A{ws.max_row}"].fill = PatternFill("solid", fgColor=HK_FILL[k])
-ws.append(["Quellen: workshop/inputs/cable_system_design.yaml (Kabeldaten), workshop/inputs/financing_term_sheet.md "
-           "(Liefermenge 9,25 TWh/Jahr); Routen: workshop/cable-route/routes.json."])
+ws.append([    "Quellen: workshop/inputs/cable_system_design.yaml (Kabeldaten); Routen: workshop/cable-route/routes.json."])
 ws.append(["Verluste sind nicht in € bewertet: Im PyPSA-Modell stecken sie im Wirkungsgrad der Verbindung."])
 
 for col, w in zip("ABCDEFGH", [52, 10, 22, 24, 20, 12, 34, 90]):
