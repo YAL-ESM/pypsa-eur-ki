@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 
 d = Path(sys.argv[1])
+sys.path.insert(0, str(d))
+import capex_opex as CO  # noqa: E402
 R = json.loads((d / "routes.json").read_text())
 P = json.loads((d / "problems.json").read_text())
 
@@ -196,6 +198,32 @@ slides.append(f"""
   </ul>
   </div>
   </div>
+</section>""")
+
+# 3d CAPEX / OPEX with provenance
+HK = {"direkt": "direkt aus den Daten", "berechnet": "aus den Daten berechnet",
+      "berechnet + Annahme": "berechnet, mit Annahme"}
+HKC = {"direkt": "d", "berechnet": "b", "berechnet + Annahme": "a"}
+fmt = lambda v, u: de(v, 1) if u in ("Mrd. €", "TWh/Jahr") else (str(v) if u == "Jahr" else de(v))
+corows = ""
+for name, art, unit, vals, hk, _ in CO.rows(d):
+    cls_ = ' class="hl"' if name == "OPEX gesamt" else ""
+    b = (lambda t: f"<b>{t}</b>") if name in ("OPEX gesamt",) or art == "CAPEX" else (lambda t: t)
+    corows += (f"<tr{cls_}><td>{b(name)}</td><td>{art}</td>" + "".join(f"<td class='r'>{b(fmt(v, unit))}</td>" for v in vals)
+               + f"<td>{unit}</td><td class='hk {HKC[hk]}'>{HK[hk]}</td></tr>")
+slides.append(f"""
+<section class="dense">
+  <h2>CAPEX und OPEX der drei Routen (2 GW, Preisbasis 2025)</h2>
+  <table class="mid"><tr><th>Posten</th><th>Art</th><th class="r">A · Touros</th><th class="r">B · Touros flach</th>
+    <th class="r">C · Pecém</th><th>Einheit</th><th>Herkunft</th></tr>{corows}</table>
+  <ul style="font-size:14px;margin-top:10px">
+    <li><b>Herkunft:</b> <i>direkt</i> = steht so in den Daten; <i>berechnet</i> = mit den Daten gerechnet;
+        <i>mit Annahme</i> = zusätzlich eine eigene Annahme nötig.</li>
+    <li><b>Reparaturen:</b> Fehlerrate und Kosten je Einsatz stammen aus den Kabeldaten. Annahme: Ersatzkabel auf Lager und
+        ein reserviertes Reparaturschiff kosten nichts extra, weil die Daten dafür nichts angeben.</li>
+    <li><b>Verluste</b> nicht in €: Im Modell stecken sie im Wirkungsgrad, sonst wären sie doppelt gezählt.</li>
+    <li>{CO.NOT_INCLUDED} Alle Werte gerundet, Excel: capex_opex.xlsx.</li>
+  </ul>
 </section>""")
 
 for ps in P["slides"]:
@@ -393,6 +421,7 @@ h3{font-size:20px;margin:0 0 4px;color:var(--acc)}
 table.rt{font-size:13px}table.rt td,table.rt th{padding:5px 7px}table.rt tr.pro td,table.rt tr.con td{font-size:12.5px}
 .dense h2{font-size:24px;margin-bottom:12px}.dense table{font-size:12px}.dense td{padding:4px 8px}.dense .note{font-size:11px;margin-top:8px}
 .tag{display:inline-block;font-size:.72em;font-weight:700;line-height:1;padding:2px 4px;border-radius:3px;vertical-align:1px;margin:0 1px}
+.hk{font-size:12px;white-space:nowrap}.hk.d{color:#1d5aa6}.hk.b{color:#52514e}.hk.a{color:#9a4a0e;font-weight:600}
 .tag.d{background:#e3eefb;color:#1d5aa6}.tag.a{background:#fbe9dc;color:#9a4a0e}
 .lg{position:absolute;left:64px;bottom:18px;color:var(--muted);font-size:12px}
 .pg{position:absolute;right:28px;bottom:18px;color:var(--muted);font-size:13px}

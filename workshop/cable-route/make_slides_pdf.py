@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 d = Path(sys.argv[1])
+sys.path.insert(0, str(d))
+import capex_opex as CO  # noqa: E402
 R = json.loads((d / "routes.json").read_text())
 INK, INK2, MUTED, LINE, ACC, WARN, HL = "#0b0b0b", "#52514e", "#8a8880", "#e6e5e0", "#2a78d6", "#b5560f", "#eef4fc"
 W, H = 13.333, 7.5
@@ -30,7 +32,7 @@ land = {"cost_Touros": "Touros/Natal", "cost_Pecem": "Pecém", "cost_SaoLuis": "
 tots = [R[k]["total_bn"] for k in land]
 A, B, C = R["cost_Touros"], R["shallow"], R["cost_Pecem"]
 P = json.loads((d / "problems.json").read_text())
-N_SLIDES = 16 + len(P["slides"])
+N_SLIDES = 17 + len(P["slides"])
 LEGEND = ("[D] = aus den Workshop-Daten oder daraus berechnet   ·   "
           "[A] = allgemeines Fachwissen, nicht durch die Daten im Repo belegt")
 
@@ -246,6 +248,26 @@ with PdfPages(d / "slides.pdf") as pdf:
         "Nicht enthalten: laufende Wartung, Ersatzkabel auf Lager, ein reserviertes Reparaturschiff. [D] "
         "Fallen im Bündel beide Pole aus (z. B. Anker), steht die ganze Leistung still. [A]",
     ], size=13, width=5.3, gap=0.2)
+    s.save()
+
+    # 3d CAPEX / OPEX with provenance
+    s = Slide(pdf, None, "CAPEX und OPEX der drei Routen (2 GW, Preisbasis 2025)")
+    HK = {"direkt": "direkt aus den Daten", "berechnet": "aus den Daten berechnet", "berechnet + Annahme": "berechnet, mit Annahme"}
+    fmt = lambda v, u: de(v, 1) if u in ("Mrd. €", "TWh/Jahr") else (str(v) if u == "Jahr" else de(v))
+    CR = CO.rows(d)
+    y = s.table(0.5, 1.25, [4.1, 0.95, 1.2, 1.4, 1.2, 1.35, 2.1],
+                [["Posten", "Art", "A · Touros", "B · Touros flach", "C · Pecém", "Einheit", "Herkunft"]] +
+                [[n, a, *[fmt(v, u) for v in vals], u, HK[hk]] for n, a, u, vals, hk, _ in CR],
+                size=10.5, right=(2, 3, 4), hl_rows=(4,),
+                bold_cells={(1, k) for k in range(5)} | {(4, k) for k in range(5)})
+    s.bullets(0.55, y + 0.1, [
+        "Herkunft: direkt = steht so in den Daten; berechnet = mit den Daten gerechnet; mit Annahme = zusätzlich eine "
+        "eigene Annahme nötig.",
+        "Reparaturen: Fehlerrate und Kosten je Einsatz stammen aus den Kabeldaten. Annahme: Ersatzkabel auf Lager und ein "
+        "reserviertes Reparaturschiff kosten nichts extra, weil die Daten dafür nichts angeben.",
+        "Verluste nicht in €: Im Modell stecken sie im Wirkungsgrad, sonst wären sie doppelt gezählt.",
+        CO.NOT_INCLUDED + " Alle Werte gerundet, Excel: capex_opex.xlsx.",
+    ], size=10.5, width=12.2, gap=0.06)
     s.save()
 
     # implementation factors (problems.json)

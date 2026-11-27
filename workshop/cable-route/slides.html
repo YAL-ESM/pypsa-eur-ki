@@ -20,6 +20,7 @@ h3{font-size:20px;margin:0 0 4px;color:var(--acc)}
 table.rt{font-size:13px}table.rt td,table.rt th{padding:5px 7px}table.rt tr.pro td,table.rt tr.con td{font-size:12.5px}
 .dense h2{font-size:24px;margin-bottom:12px}.dense table{font-size:12px}.dense td{padding:4px 8px}.dense .note{font-size:11px;margin-top:8px}
 .tag{display:inline-block;font-size:.72em;font-weight:700;line-height:1;padding:2px 4px;border-radius:3px;vertical-align:1px;margin:0 1px}
+.hk{font-size:12px;white-space:nowrap}.hk.d{color:#1d5aa6}.hk.b{color:#52514e}.hk.a{color:#9a4a0e;font-weight:600}
 .tag.d{background:#e3eefb;color:#1d5aa6}.tag.a{background:#fbe9dc;color:#9a4a0e}
 .lg{position:absolute;left:64px;bottom:18px;color:var(--muted);font-size:12px}
 .pg{position:absolute;right:28px;bottom:18px;color:var(--muted);font-size:13px}
@@ -138,6 +139,19 @@ table.rt{font-size:13px}table.rt td,table.rt th{padding:5px 7px}table.rt tr.pro 
   </ul>
   </div>
   </div>
+</section>
+<section class="dense">
+  <h2>CAPEX und OPEX der drei Routen (2 GW, Preisbasis 2025)</h2>
+  <table class="mid"><tr><th>Posten</th><th>Art</th><th class="r">A · Touros</th><th class="r">B · Touros flach</th>
+    <th class="r">C · Pecém</th><th>Einheit</th><th>Herkunft</th></tr><tr><td><b>Investition (Kabel, Konverter, Muffen, Anlandung, Reserve)</b></td><td>CAPEX</td><td class='r'><b>68,2</b></td><td class='r'><b>69,4</b></td><td class='r'><b>69,9</b></td><td>Mrd. €</td><td class='hk b'>aus den Daten berechnet</td></tr><tr><td>Laufende Wartung (ohne Reparaturen)</td><td>OPEX</td><td class='r'>250</td><td class='r'>250</td><td class='r'>250</td><td>Mio. €/Jahr</td><td class='hk b'>aus den Daten berechnet</td></tr><tr><td>Reparatureinsätze</td><td>OPEX</td><td class='r'>12</td><td class='r'>13</td><td class='r'>11</td><td>Mio. €/Jahr</td><td class='hk a'>berechnet, mit Annahme</td></tr><tr class="hl"><td><b>OPEX gesamt</b></td><td>OPEX</td><td class='r'><b>262</b></td><td class='r'><b>263</b></td><td class='r'><b>261</b></td><td>Mio. €/Jahr</td><td class='hk b'>aus den Daten berechnet</td></tr><tr><td>OPEX über 40 Jahre, nicht abgezinst</td><td>OPEX</td><td class='r'>10,5</td><td class='r'>10,5</td><td class='r'>10,4</td><td>Mrd. €</td><td class='hk b'>aus den Daten berechnet</td></tr><tr><td>Lebensdauer Kabel und Konverter</td><td>Kennzahl</td><td class='r'>40</td><td class='r'>40</td><td class='r'>40</td><td>Jahre</td><td class='hk d'>direkt aus den Daten</td></tr><tr><td>Preisbasis</td><td>Kennzahl</td><td class='r'>2025</td><td class='r'>2025</td><td class='r'>2025</td><td>Jahr</td><td class='hk d'>direkt aus den Daten</td></tr><tr><td>Verluste bei 9,25 TWh/Jahr Lieferung</td><td>Kennzahl</td><td class='r'>3,2</td><td class='r'>3,3</td><td class='r'>3,0</td><td>TWh/Jahr</td><td class='hk a'>berechnet, mit Annahme</td></tr><tr><td>Tage mit halber Leistung</td><td>Kennzahl</td><td class='r'>54</td><td class='r'>57</td><td class='r'>52</td><td>Tage/Jahr</td><td class='hk b'>aus den Daten berechnet</td></tr></table>
+  <ul style="font-size:14px;margin-top:10px">
+    <li><b>Herkunft:</b> <i>direkt</i> = steht so in den Daten; <i>berechnet</i> = mit den Daten gerechnet;
+        <i>mit Annahme</i> = zusätzlich eine eigene Annahme nötig.</li>
+    <li><b>Reparaturen:</b> Fehlerrate und Kosten je Einsatz stammen aus den Kabeldaten. Annahme: Ersatzkabel auf Lager und
+        ein reserviertes Reparaturschiff kosten nichts extra, weil die Daten dafür nichts angeben.</li>
+    <li><b>Verluste</b> nicht in €: Im Modell stecken sie im Wirkungsgrad, sonst wären sie doppelt gezählt.</li>
+    <li>Nicht enthalten: Bauzinsen über ≈ 6 Jahre, Preissteigerung ab 2025, Netzanschluss an Land in Deutschland, Erlösausfall bei Reparaturen (Umsatz, keine Kosten). Alle Werte gerundet, Excel: capex_opex.xlsx.</li>
+  </ul>
 </section>
 <section class="dense">
   <h2>Wichtigste Faktoren (1/2): Technik</h2>

@@ -1,0 +1,46 @@
+"""CAPEX and OPEX per proposed route, rounded aggregates only (no supplier unit prices).
+
+Used by make_slides.py, make_slides_pdf.py and make_capex_opex_xlsx.py.
+Herkunft: "direkt" = steht so in den Workshop-Daten, "berechnet" = aus den Daten gerechnet,
+"Annahme" = zusätzliche Annahme ohne Beleg in den Daten.
+"""
+import json
+from pathlib import Path
+
+ROUTES = [("cost_Touros", "A · Touros, kostenminimal"), ("shallow", "B · Touros, geringste Tiefe"),
+          ("cost_Pecem", "C · Pecém, kürzeste")]
+FOM = {"cost_Touros": 250, "shallow": 250, "cost_Pecem": 250}      # Mio. EUR/a, rounded
+REPAIR = {"cost_Touros": 12, "shallow": 13, "cost_Pecem": 11}      # Mio. EUR/a, rounded
+LOSS_TWH = {"cost_Touros": 3.2, "shallow": 3.3, "cost_Pecem": 3.0}  # TWh/a at 9.25 TWh delivered
+LIFE = 40
+
+
+def rows(d):
+    R = json.loads((Path(d) / "routes.json").read_text())
+    r = [R[k] for k, _ in ROUTES]
+    opex = [FOM[k] + REPAIR[k] for k, _ in ROUTES]
+    # (Posten, Art, Einheit, values, Herkunft, Erläuterung)
+    return [
+        ("Investition (Kabel, Konverter, Muffen, Anlandung, Reserve)", "CAPEX", "Mrd. €",
+         [x["total_bn"] for x in r], "berechnet",
+         "Route je Tiefenklasse × Kosten je km aus den Kabeldaten, dazu Fixkosten und die Reserve aus den Daten."),
+        ("Laufende Wartung (ohne Reparaturen)", "OPEX", "Mio. €/Jahr", [FOM[k] for k, _ in ROUTES], "berechnet",
+         "Fester Prozentsatz der Investition laut Kabeldaten, gerundet."),
+        ("Reparatureinsätze", "OPEX", "Mio. €/Jahr", [REPAIR[k] for k, _ in ROUTES], "berechnet + Annahme",
+         "Fehlerrate und Kosten je Einsatz aus den Kabeldaten. Annahme: Ersatzkabel und reserviertes Schiff "
+         "sind nicht enthalten, weil die Daten dafür nichts angeben."),
+        ("OPEX gesamt", "OPEX", "Mio. €/Jahr", opex, "berechnet", "Summe der beiden Zeilen darüber."),
+        (f"OPEX über {LIFE} Jahre, nicht abgezinst", "OPEX", "Mrd. €", [round(o * LIFE / 1000, 1) for o in opex],
+         "berechnet", f"Lebensdauer {LIFE} Jahre laut Kabeldaten."),
+        ("Lebensdauer Kabel und Konverter", "Kennzahl", "Jahre", [LIFE] * 3, "direkt", "Kabeldaten."),
+        ("Preisbasis", "Kennzahl", "Jahr", [2025] * 3, "direkt", "Kabeldaten und Term Sheet."),
+        ("Verluste bei 9,25 TWh/Jahr Lieferung", "Kennzahl", "TWh/Jahr", [LOSS_TWH[k] for k, _ in ROUTES],
+         "berechnet + Annahme", "Leiterwiderstand und Konverterverluste aus den Kabeldaten. Annahme: Das Kabel überträgt genau die "
+         "Liefermenge laut Term Sheet, gleichmäßig über das Jahr. Nicht in € bewertet: im Modell über den Wirkungsgrad erfasst."),
+        ("Tage mit halber Leistung", "Kennzahl", "Tage/Jahr", [round(x["half_power_days_per_year"]) for x in r],
+         "berechnet", "Fehlerrate × Reparaturdauer je Tiefenklasse aus den Kabeldaten."),
+    ]
+
+
+NOT_INCLUDED = ("Nicht enthalten: Bauzinsen über ≈ 6 Jahre, Preissteigerung ab 2025, Netzanschluss an Land in "
+                "Deutschland, Erlösausfall bei Reparaturen (Umsatz, keine Kosten).")
