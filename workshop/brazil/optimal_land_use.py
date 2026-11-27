@@ -41,6 +41,46 @@ st, DATA, OUT, CELL = po.st, po.DATA, po.OUT, po.CELL
 MW, WAKE, SLOPE = po.MW_PER_KM2, po.WAKE_LOSS, po.MAX_SLOPE_DEG
 
 
+def coast_point(uf, ufs, states, state_id, km2, use_w, use_s, e_w, e_s):
+    """Coast point nearest to the output-weighted centre of the best mix in state `uf`.
+
+    The coast is the part of the state border that lies on the EEZ (Marine Regions), i.e. on the sea.
+    Distances in ESRI:102033 (South America Albers). Also prints how much of the yearly output lies within
+    100 / 250 / 500 km of that point, for the state and for Brazil as a whole.
+    """
+    from pyproj import Transformer
+    from shapely.geometry import Point
+    from shapely.ops import nearest_points
+
+    i = ufs.index(uf) + 1
+    energy = km2 * np.where(use_w, e_w, np.where(use_s, e_s, 0.0))  # GWh per pixel and year
+    yy, xx = np.nonzero((state_id == i) & (energy > 0))
+    w = energy[yy, xx].astype("float64")
+    lon_c, lat_c = np.average(pe.LON[xx], weights=w), np.average(pe.LAT[yy], weights=w)
+
+    to_xy = Transformer.from_crs("EPSG:4326", "ESRI:102033", always_xy=True)
+    to_ll = Transformer.from_crs("ESRI:102033", "EPSG:4326", always_xy=True)
+    shape = states[states.uf == uf].to_crs("ESRI:102033").geometry.union_all()
+    eez = gpd.read_file(DATA / "layers/eez_brazil.gpkg").to_crs("ESRI:102033").geometry.union_all().simplify(500)
+    coast = shape.boundary.intersection(eez.buffer(3000))
+    c = Point(*to_xy.transform(lon_c, lat_c))
+    near = nearest_points(coast, c)[0]
+    lon_k, lat_k = to_ll.transform(near.x, near.y)
+    print(f"\nState {uf}: output-weighted centre {lat_c:.3f}, {lon_c:.3f}")
+    print(f"Nearest coast point:      {lat_k:.3f}, {lon_k:.3f}   ({near.distance(c) / 1e3:,.0f} km from the centre)")
+
+    ay, ax_ = np.nonzero(energy > 0)
+    px, py = to_xy.transform(pe.LON[ax_], pe.LAT[ay])
+    dist = np.hypot(px - near.x, py - near.y) / 1e3
+    e = energy[ay, ax_] / 1e3  # TWh
+    in_state = state_id[ay, ax_] == i
+    for r in (100, 250, 500, 1000):
+        m = dist <= r
+        print(f"  within {r:>4} km of the coast point: {e[m].sum():8,.0f} TWh/yr in Brazil, {e[m & in_state].sum():8,.0f} in {uf}")
+    pd.DataFrame([{"state": uf, "centre_lat": lat_c, "centre_lon": lon_c, "coast_lat": lat_k, "coast_lon": lon_k,
+                   "distance_km": near.distance(c) / 1e3}]).to_csv(OUT / "coast_point.csv", index=False)
+
+
 def main():
     states = gpd.read_file(f"zip://{DATA}/raw/gadm/gadm41_BRA_1.json.zip")
     states["geometry"] = states.make_valid().buffer(0)
@@ -112,6 +152,8 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     bys.round(2).to_csv(OUT / "optimal_use_by_state.csv")
     print("\nTop states:\n", bys.head(10)[["onwind_TWh", "solar_TWh", "total_TWh", "onwind_GW", "solar_GW"]].round(0).astype(int))
+
+    coast_point(bys.index[0], list(states.uf), states, state_id, km2, use_w, use_s, e_w, e_s)
 
     # cells: total yearly output and share of wind
     tot_cell = twh["onwind"] + twh["solar"]
