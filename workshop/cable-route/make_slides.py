@@ -106,6 +106,7 @@ slides.append(f"""
     <div>
     <table class="rt">
       <tr><th>[D]</th><th>A · Touros<br>kostenminimal</th><th>B · Touros<br>geringste Tiefe</th><th>C · Pecém<br>kürzeste</th></tr>
+      <tr><td>Leistung</td>{cell(lambda r: '2 GW Bipol')}</tr>
       <tr><td>Länge</td>{cell(lambda r: de(r['length_km']) + ' km')}</tr>
       <tr><td>Investition</td>{cell(lambda r: de(r['total_bn'],1) + ' Mrd. €')}</tr>
       <tr><td>Max. Tiefe</td>{cell(lambda r: de(r['max_depth_m']) + ' m')}</tr>
@@ -117,7 +118,7 @@ slides.append(f"""
       <tr class="hl"><td><b>Bewertung</b></td><td>Rückfalloption, wenn die Biskaya qualifiziert wird</td>
         <td><b>Vorschlag:</b> technisch am wenigsten extrem, ≈ 2 % teurer</td><td>nur bei Anlandung in Pecém; höchstes Tiefenrisiko</td></tr>
     </table>
-    <p class="note">Kostengünstigste Wege auf einem 0,05°-Raster. Alle Varianten liegen über dem Doppelten des Budgets.
+    <p class="note">Alle Werte für <b>2 GW</b> (Bipol, 525 kV, zwei Kabel mit je ≈ 1 GW). Kostengünstigste Wege auf einem 0,05°-Raster. Alle Varianten liegen über dem Doppelten des Budgets.
        Die Anlandepunkte in Brasilien sind Beispiele, die Auswahl ist noch offen. [D]</p>
     </div>
   </div>
@@ -194,6 +195,40 @@ slides.append("""
     <li>Höhere Spannung, z. B. 800 statt 525 kV, ergäbe ≈ 43 % der Verluste. [A]
         <span class="warn">Dafür gibt es keine Kabeldaten, das ist eine Annahme.</span></li>
   </ul>
+</section>""")
+
+
+slides.append("""
+<section>
+  <h2>Mehr oder weniger als 2 GW: Was ändert sich?</h2>
+  <div class="cols">
+  <div>
+  <ul>
+    <li><b>2 GW gilt für das ganze System</b>: ein Bipol aus zwei Kabeln mit je ≈ 1 GW.
+        Fällt ein Kabel aus, bleibt halbe Leistung. [D]</li>
+    <li>Kostendaten gibt es <b>nur für dieses eine Design</b>. Wie sich die Kosten mit der Leistung ändern,
+        ist aus den Daten <b>nicht ablesbar</b>. [D]</li>
+    <li>Das Kabel macht ≈ 95 % der Kosten aus [D]. Sein Preis hängt vor allem vom Leiterquerschnitt ab,
+        also vom Strom. [A]</li>
+    <li class="key">PyPSA-Eur rechnet <b>linear in MW</b> (HVDC submarine: 3.220 €/MW/km, DEA 2025). Bei 2 GW liegt das
+        in derselben Größenordnung wie unsere Daten. [D] Wählt das Modell die Leistung selbst, unterstellt es eine
+        Skalierung, die für dieses Kabel nicht belegt ist. [A]</li>
+  </ul>
+  </div>
+  <div>
+  <table>
+    <tr><th style="width:26%">Leistung</th><th>Kosten und Verluste</th></tr>
+    <tr><td><b>Weniger</b>, z. B. 1 GW</td><td>Dünnere Kabel, also billiger, aber kaum halb so teuer: Isolierung, Armierung,
+        Verlegung und Muffen bleiben. Verluste in % bei passendem Querschnitt etwa gleich. [A]</td></tr>
+    <tr><td><b>2 GW-Kabel, halb ausgelastet</b></td><td>Investition gleich, Verluste ≈ 18 statt ≈ 35 %. [D]</td></tr>
+    <tr><td><b>Mehr</b>, z. B. 3–4 GW</td><td>Bei 525 kV sind die Querschnitte schon nahe am Maximum; schwerere Kabel sind
+        in der Tiefsee kritisch. [A] Wege: höhere Spannung (keine Kabeldaten) oder ein zweiter Bipol,
+        ≈ doppelte Kabelkosten, also annähernd linear. [A]</td></tr>
+  </table>
+  <p class="note"><span class="warn">Nächster Schritt:</span> Angebote für andere Leistungen anfragen, z. B. 1 GW
+     und 640 kV, bevor das Modell die Leistung frei wählt. [A]</p>
+  </div>
+  </div>
 </section>""")
 
 

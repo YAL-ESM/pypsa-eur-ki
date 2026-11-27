@@ -31,7 +31,7 @@ tots = [R[k]["total_bn"] for k in land]
 A, B, C = R["cost_Touros"], R["shallow"], R["cost_Pecem"]
 budget = 31.4
 P = json.loads((d / "problems.json").read_text())
-N_SLIDES = 13 + len(P["slides"])
+N_SLIDES = 14 + len(P["slides"])
 LEGEND = ("[D] = aus den Workshop-Daten oder daraus berechnet   ·   "
           "[A] = allgemeines Fachwissen, nicht durch die Daten im Repo belegt")
 
@@ -174,6 +174,7 @@ with PdfPages(d / "slides.pdf") as pdf:
     ABC = (A, B, C)
     y = s.table(5.75, 1.2, [1.45, 1.95, 1.95, 1.85], [
         ["[D]", "A · Touros, kostenminimal", "B · Touros, geringste Tiefe", "C · Pecém, kürzeste"],
+        ["Leistung", *["2 GW Bipol" for r in ABC]],
         ["Länge", *[f"{de(r['length_km'])} km" for r in ABC]],
         ["Investition", *[f"{de(r['total_bn'],1)} Mrd. €" for r in ABC]],
         ["Max. Tiefe", *[f"{de(r['max_depth_m'])} m" for r in ABC]],
@@ -185,8 +186,8 @@ with PdfPages(d / "slides.pdf") as pdf:
          "am tiefsten, fast 3.000 km > 3.000 m"],
         ["Bewertung", "Rückfalloption, wenn die Biskaya qualifiziert wird", "Vorschlag: technisch am wenigsten extrem, ≈ 2 % teurer",
          "nur bei Anlandung in Pecém; höchstes Tiefenrisiko"],
-    ], size=10, hl_rows=(9,), bold_cells={(7, 0), (8, 0), (9, 0), (9, 2)})
-    s.text(5.75, y, "Alle Varianten über dem Doppelten des Budgets; Anlandepunkte sind Beispiele. [D]", 10, 7.4, INK2)
+    ], size=10, hl_rows=(10,), bold_cells={(8, 0), (9, 0), (10, 0), (10, 2)})
+    s.text(5.75, y, "Alle Werte für 2 GW (Bipol, 525 kV, zwei Kabel mit je ≈ 1 GW). Alle Varianten über dem Doppelten des Budgets; Anlandepunkte sind Beispiele. [D]", 10, 7.4, INK2)
     s.save()
 
     # implementation factors (problems.json)
@@ -252,6 +253,30 @@ with PdfPages(d / "slides.pdf") as pdf:
         "Höhere Spannung, z. B. 800 statt 525 kV, ergäbe ≈ 43 % der Verluste. [A]",
     ], size=17, width=11.8, gap=0.25)
     s.text(1.05, y - 0.1, "Dafür gibt es keine Kabeldaten, das ist eine Annahme.", 15, 11, WARN)
+    s.save()
+
+    # 6b capacity other than 2 GW
+    s = Slide(pdf, None, "Mehr oder weniger als 2 GW: Was ändert sich?")
+    s.bullets(0.7, 1.45, [
+        "2 GW gilt für das ganze System: ein Bipol aus zwei Kabeln mit je ≈ 1 GW. Fällt ein Kabel aus, bleibt halbe Leistung. [D]",
+        "Kostendaten gibt es nur für dieses eine Design. Wie sich die Kosten mit der Leistung ändern, ist aus den Daten "
+        "nicht ablesbar. [D]",
+        "Das Kabel macht ≈ 95 % der Kosten aus [D]. Sein Preis hängt vor allem vom Leiterquerschnitt ab, also vom Strom. [A]",
+        "PyPSA-Eur rechnet linear in MW (HVDC submarine: 3.220 €/MW/km, DEA 2025). Bei 2 GW liegt das in derselben "
+        "Größenordnung wie unsere Daten. [D] Wählt das Modell die Leistung selbst, unterstellt es eine Skalierung, "
+        "die für dieses Kabel nicht belegt ist. [A]",
+    ], size=13.5, width=5.6, gap=0.2)
+    y = s.table(6.9, 1.4, [1.9, 4.2], [
+        ["Leistung", "Kosten und Verluste"],
+        ["Weniger, z. B. 1 GW", "Dünnere Kabel, also billiger, aber kaum halb so teuer: Isolierung, Armierung, Verlegung und "
+                                "Muffen bleiben. Verluste in % bei passendem Querschnitt etwa gleich. [A]"],
+        ["2 GW-Kabel, halb ausgelastet", "Investition gleich, Verluste ≈ 18 statt ≈ 35 %. [D]"],
+        ["Mehr, z. B. 3–4 GW", "Bei 525 kV sind die Querschnitte schon nahe am Maximum; schwerere Kabel sind in der Tiefsee "
+                               "kritisch. [A] Wege: höhere Spannung (keine Kabeldaten) oder ein zweiter Bipol, ≈ doppelte "
+                               "Kabelkosten, also annähernd linear. [A]"],
+    ], size=11.5, bold_cells={(1, 0), (2, 0), (3, 0)})
+    s.text(6.9, y + 0.15, "Nächster Schritt: Angebote für andere Leistungen anfragen, z. B. 1 GW und 640 kV, "
+                          "bevor das Modell die Leistung frei wählt. [A]", 11.5, 6.1, WARN)
     s.save()
 
     # 8 depth profiles
