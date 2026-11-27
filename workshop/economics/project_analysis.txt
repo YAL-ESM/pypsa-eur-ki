@@ -1,0 +1,143 @@
+PROJECT ANALYSIS - Brazilian-German HVDC interconnector
+Role 4 (economic analysis) - consolidated information
+Status: 2025-11-27
+================================================================================
+
+This file collects everything the group has for the project analysis: the
+decided study design, what each role has delivered, the consolidated costs and
+the status. It is the single reference for the final results.
+
+
+1. STUDY DESIGN (DECIDED)
+--------------------------------------------------------------------------------
+- Study type:  cost-benefit analysis of a given cable. No capacity expansion;
+               the cable size is fixed, the model only dispatches it.
+- Base year:   2025 (present-value reference year).
+- Currency:    EUR, real 2025 prices, everywhere (Germany, Brazil, cable).
+- Landing:     German node 08 (bus DE0 8AC), North.
+- Construction: 6-7 years for the cable.
+- Comparison:  system with the cable against the system without it.
+- Discount rate: one study rate, 2% real (band 1-3%), applied in POST-PROCESSING
+               to the net present value. The model's own discount rate (7% for
+               asset annualisation) is role 3's and is not changed here.
+- Role 4 works from the model outputs in post-processing; it does not change
+   the model's discount rates.
+
+
+2. CABLE - ROLE 1 (workshop/cable-route)
+--------------------------------------------------------------------------------
+Design: 2 GW bipole, 525 kV XLPE, design life 40 years. Three routes, all from
+the landing Macau / Guamare (RN, Brazil) to German node 08.
+
+Route            length   max depth   CAPEX    FOM     repair  losses     half-power
+                 km       m           bn EUR   M/yr    M/yr    full/half  days/yr
+A  cost_Macau    8,956    4,923       68.6     250     12      36.0/18.9  54.5
+B  shallow       9,139    4,576       69.7     250     13      36.4/19.0  57.2
+C  minabyss      9,710    4,819       71.9     260     14      38.6/20.2  59.2
+
+Annualised cable cost at 7% over 40 years, plus the 38 M EUR/yr connection to
+the landing (role 2, variant A):
+
+A  cost_Macau    5.45 bn EUR/yr   2,722,813 EUR/MW/yr
+B  shallow       5.53 bn EUR/yr   2,764,568 EUR/MW/yr
+C  minabyss      5.71 bn EUR/yr   2,852,579 EUR/MW/yr
+
+Not included (role 1): financing costs during construction, price escalation
+after 2025, onshore grid connection in Germany. Per-unit supplier costs and the
+project reference are confidential and are not reproduced anywhere.
+
+
+3. BRAZIL - ROLE 2 (workshop/brazil)
+--------------------------------------------------------------------------------
+Brazil is a dedicated export site: no Brazilian demand, no Brazilian grid.
+
+Landing point: north coast of Rio Grande do Norte (RN), Macau / Guamare
+  Latitude -5.0667, longitude -36.4517.
+
+Firm supply, variant A (with connections, onshore-wind mix): enough to deliver
+2 GW into the cable in every hour of weather year 2013.
+  Solar PV       8.68 GW   (capacity factor ~0.19)
+  Onshore wind   3.47 GW   (capacity factor ~0.50)
+  Battery        3.20 GW / 30 GWh
+  Connection to the landing: 38 M EUR/yr.
+
+Hourly time series (aggregate output per technology, 8,760 h, weather year 2013):
+  workshop/brazil/timeseries/firm_supply_timeseries.csv        variant A (used)
+  workshop/brazil/timeseries/firm_supply_timeseries_noconn.csv variant B (offshore)
+
+Asset costs, real 2025 EUR, annualised at 7% (converted from role 2's 2035
+figures using the model's 2025 cost data):
+  Solar PV              58,293 EUR/MW/yr   (58.3 EUR/kW/yr)
+  Onshore wind         135,624 EUR/MW/yr   (135.6 EUR/kW/yr)
+  Battery storage       22,387 EUR/MWh/yr  (22.4 EUR/kWh/yr)
+  Battery inverter      41,651 EUR/MW/yr   (41.7 EUR/kW/yr)
+
+Caveat: these are European cost data used as proxies; Brazilian costs are not
+derived yet. The connection cost is still on role 2's 2035 basis (small item).
+
+
+4. GERMAN SYSTEM - ROLE 3
+--------------------------------------------------------------------------------
+Base run: trade variant "de10-trade" - Germany with six neighbours (FR, NL, PL,
+DK, AT, CH), 17 nodes, 3-hour steps, cross-border capacity s_max_pu 0.3, CO2
+price and cap shared with Germany. This is the reference system the cable is
+judged against. Role 3 is providing the solved networks with and without the
+project (the runs are too large for this workspace).
+
+2050: the zero-CO2 cap is relaxed, but 2050 stays as a target year. This removes
+the artefact role 3 flagged (in the strict baseline the cap makes clean power
+look enormously valuable in 2050 alone).
+
+Known effect (role 3 caveat, workshop/trade/caveat-2050.md): the cable is very
+expensive per MWh delivered, so it does not pay against 2025-2045 German prices.
+
+
+5. ECONOMICS AND WIRING - ROLE 4
+--------------------------------------------------------------------------------
+Wiring (adds Brazil and the cable to the model at network composition):
+  scripts/add_brazil_cable.py     the components
+  scripts/compose_network.py      calls it (behind the config flag)
+  config/config.brazil-cable.yaml route, landing, capacities, consolidated costs
+
+Components added:
+  - Brazilian AC bus and battery bus at the landing;
+  - solar and onshore-wind generators at the fixed variant-A capacities, with
+    role 2's hourly profiles as p_max_pu;
+  - battery as Store + charger + discharger (3,200 MW / 30 GWh);
+  - cable Link BR0 0AC -> DE0 8AC, 2 GW fixed, efficiency from the route's
+    full-load losses, availability from the fault days, lifetime 40, capital
+    cost from role 1's aggregates, carrier "Brazil cable".
+
+How to run the case with the project (once the base inputs exist):
+  pixi run snakemake results/de10-brazil/networks/solved_2050.nc -c4 \
+    --configfile config/config.workshop.yaml config/config.trade.yaml \
+    config/config.brazil-cable.yaml --forcerun compose_network
+
+Post-processing (role 4): net present value at 2% real (1-3% band), system cost
+with vs without, cable utilisation, prices, emissions, who gains and who loses.
+The results template is workshop/economics/results_deck_template.pdf.
+
+
+6. STATUS AND WHAT IS NEEDED
+--------------------------------------------------------------------------------
+Done:
+  - study design and one discount-rate convention;
+  - cable routes, technical data and costs (role 1);
+  - Brazilian landing, firm supply, hourly profiles and costs (role 2);
+  - base system design and 2050 treatment (role 3);
+  - consolidated costs in real 2025 EUR and the model wiring (role 4).
+
+Still needed:
+  - the reference run (without the project) and the project run, both solved
+    with and without the cable, provided by role 3;
+  - then role 4 post-processes the pair into the results.
+
+
+7. OPEN POINTS / CAVEATS
+--------------------------------------------------------------------------------
+- Brazilian generation costs are European proxies, not derived Brazilian costs.
+- The connection cost (38 M EUR/yr) is still on role 2's 2035 basis.
+- Cable losses are modelled as a single full-load efficiency; availability as a
+  constant from the average fault days.
+- The 2050 horizon dominates the apparent value; results are reported across the
+  1-3% discount band and with 2050 flagged.
