@@ -1,0 +1,70 @@
+Costs of a steady 2 GW into the cable, north coast of Rio Grande do Norte (RN), Brazil
+======================================================================================
+Source: workshop/brazil/firm_supply.py. Weather year 2013 (ERA5). Plants within 150 km of the landing,
+battery at the landing, at least 2 GW into the cable in every hour.
+Costs: PyPSA-Eur European cost data for 2035 (annualised investment + fixed O&M, 7% discount rate).
+Brazilian costs are not derived yet: read the figures as a comparison, not as Brazilian prices.
+
+Cost assumptions (annualised)
+  Solar PV                      44.3 EUR/kW/yr   (investment 443 EUR/kW, lifetime 40 yr)
+  Onshore wind                 124.5 EUR/kW/yr   (investment 1,345 EUR/kW, lifetime 30 yr)
+  Offshore wind, fixed         210.3 EUR/kW/yr   (investment 2,040 EUR/kW, lifetime 30 yr)
+  Offshore wind, floating      287.9 EUR/kW/yr   (investment 2,710 EUR/kW, lifetime 20 yr)
+  Battery storage               13.1 EUR/kWh/yr  (investment 158 EUR/kWh)
+  Battery inverter              25.5 EUR/kW/yr   (investment 174 EUR/kW, efficiency 0.96)
+  Connection on land            64.8 EUR/MW/km/yr (HVAC overhead line)
+  Connection at sea            432.0 EUR/MW/km/yr (AC submarine cable) + substation 73.8 EUR/kW/yr
+
+A) With connections from the plants to the landing
+--------------------------------------------------------------------------------------
+  Landing point: -5.07, -36.45 (RN)
+  Technology                     GW     CF   TWh/yr  M EUR/yr  EUR/MWh
+  Solar PV                     8.68   0.19     14.3       384     26.8
+  Onshore wind                 3.47   0.50     15.1       432     28.6
+  Battery                      3.20 GW, 30 GWh             475
+  Connections                                              38
+  Total                                                  1329
+
+  Plants on average (generation cost):       27.7 EUR/MWh   (29.4 TWh/yr generated)
+  Steady 2 GW into the cable (all costs):    75.9 EUR/MWh   (17.5 TWh/yr delivered)
+  Surplus not fitting into the cable:         40% of the generation
+
+B) Without connection costs (plants and battery only)
+--------------------------------------------------------------------------------------
+  Landing point: -5.09, -36.65 (RN)
+  Technology                     GW     CF   TWh/yr  M EUR/yr  EUR/MWh
+  Solar PV                     8.44   0.20     14.5       374     25.9
+  Offshore wind, fixed         1.81   0.72     11.5       382     33.2
+  Battery                      3.21 GW, 30 GWh             473
+  Connections                                               0
+  Total                                                  1229
+
+  Plants on average (generation cost):       29.1 EUR/MWh   (26.0 TWh/yr generated)
+  Steady 2 GW into the cable (all costs):    70.1 EUR/MWh   (17.5 TWh/yr delivered)
+  Surplus not fitting into the cable:         33% of the generation
+
+C) Cheapest landing point per state, steady 2 GW, EUR/MWh
+--------------------------------------------------------------------------------------
+  State   with connections   without
+  RN                  75.9      70.1
+  CE                  79.2      70.6
+  PB                  84.5      77.8
+  MA                  86.1      79.8
+  PI                  86.3      79.8
+  SE                  89.1      81.8
+  AL                  89.9      81.8
+  BA                  91.7      85.8
+  PA                  99.1      93.8
+  PE                 101.7      89.9
+  AP                 107.5      95.5
+  RS                 112.5     103.9
+  ES                 112.6      98.7
+  RJ                 113.9     105.7
+  SC                 121.4     108.9
+  SP                 131.3     110.5
+  PR                 165.6     136.8
+
+Notes
+  - The battery is the largest single cost; the plants alone generate below 30 EUR/MWh.
+  - Run B picks fixed offshore wind instead of onshore wind. The offshore capacity factors near the RN coast
+    (about 0.7) look too high and are not checked yet; treat run A as the more reliable mix.
