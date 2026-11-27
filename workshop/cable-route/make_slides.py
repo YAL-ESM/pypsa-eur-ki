@@ -26,7 +26,6 @@ land = {"cost_Touros": "Touros/Natal", "cost_Pecem": "Pecém", "cost_SaoLuis": "
 lens = [R[k]["length_km"] for k in land]
 tots = [R[k]["total_bn"] for k in land]
 A, B, C = R["cost_Touros"], R["shallow"], R["cost_Pecem"]
-budget = 31.4
 
 slides = []
 
@@ -51,8 +50,7 @@ slides.append(f"""
   <ol>
     <li><b>Technisch nicht erprobt:</b> Jede Route ist tiefer als 3.000 m, selbst die flachste bis
         ≈ {de(B['max_depth_m'])} m. Verlegt wurde bisher bis 2.150 m. [D]</li>
-    <li><b>Zu teuer:</b> {de(min(tots),1)}–{de(max(tots),1)} Mrd. €, das
-        <b>{de(min(tots)/budget,1)}–{de(max(tots)/budget,1)}-Fache</b> des Budgets von {de(budget,1)} Mrd. €. [D]</li>
+    <li><b>Hohe Kosten:</b> {de(min(tots),1)}–{de(max(tots),1)} Mrd. € Investition für Kabel und Konverter. [D]</li>
     <li><b>Hohe Verluste:</b> Bei Volllast kommt nur ≈ ⅔ der Leistung an. [D]</li>
     <li><b>Lange Bauzeit:</b> mit einem Verlegeschiff gut 6 Jahre. [D]</li>
   </ol>
@@ -63,7 +61,6 @@ slides.append(f"""
     <li>Die <b>Route ist kaum ein Hebel</b>: Die Varianten unterscheiden sich um ≈ 2 % in den Kosten. [D]</li>
     <li><b>Voraussetzung</b> für jede Variante: ein Kabel, das für ≈ 4.500 m qualifiziert ist. [D]</li>
     <li><b>Verluste senken</b>: höhere Spannung oder größerer Querschnitt [A], Teillastbetrieb [D].</li>
-    <li><b>Budget</b> nur erreichbar, wenn die Kosten pro km um mehr als die Hälfte sinken. [D]</li>
     <li><b>Bauzeit</b>: mehrere Schiffe parallel, Bau in Abschnitten. [A]</li>
   </ul>
   </div>
@@ -74,7 +71,7 @@ slides.append(f"""
 RISKS = [
     ["Tiefe über 3.000 m", "Für 3.000–6.000 m gibt es nur eine Designstudie; jede Route reicht tiefer. [D]",
      "Qualifizierung für ≈ 4.500 m (Zuschuss in Aussicht); flachste Route B. [D]"],
-    ["Kosten und Finanzierung", f"{de(min(tots),1)}–{de(max(tots),1)} Mrd. € gegenüber {de(budget,1)} Mrd. € Budget. [D]",
+    ["Kosten und Finanzierung", f"{de(min(tots),1)}–{de(max(tots),1)} Mrd. € Investition für Kabel und Konverter. [D]",
      "Staatliche Kreditgarantie und Zuschüsse [D]; geringere Leistung oder Bau in Stufen. [A]"],
     ["Verluste", "≈ 35 % bei Volllast, ≈ 18 % bei halber Last. [D]",
      "Höhere Spannung oder größerer Querschnitt [A]; Teillastbetrieb. [D]"],
@@ -118,7 +115,7 @@ slides.append(f"""
       <tr class="hl"><td><b>Bewertung</b></td><td>Rückfalloption, wenn die Biskaya qualifiziert wird</td>
         <td><b>Vorschlag:</b> technisch am wenigsten extrem, ≈ 2 % teurer</td><td>nur bei Anlandung in Pecém; höchstes Tiefenrisiko</td></tr>
     </table>
-    <p class="note">Alle Werte für <b>2 GW</b> (Bipol, 525 kV, zwei Kabel mit je ≈ 1 GW). Kostengünstigste Wege auf einem 0,05°-Raster. Alle Varianten liegen über dem Doppelten des Budgets.
+    <p class="note">Alle Werte für <b>2 GW</b> (Bipol, 525 kV, zwei Kabel mit je ≈ 1 GW). Kostengünstigste Wege auf einem 0,05°-Raster.
        Die Anlandepunkte in Brasilien sind Beispiele, die Auswahl ist noch offen. [D]</p>
     </div>
   </div>
@@ -277,7 +274,6 @@ slides.append("""
   <h2>Methode, Quellen und Grenzen</h2>
   <ul>
     <li><b>Kabeldaten</b>: workshop/inputs/cable_system_design.yaml (Preisbasis 2025, EUR).</li>
-    <li><b>Budget</b>: workshop/inputs/financing_term_sheet.md (Obergrenze 31,4 Mrd. €).</li>
     <li><b>Bathymetrie</b>: GEBCO 2025, Atlantik-Korridor 30″; für die Routensuche auf 0,05° gemittelt.</li>
     <li><b>Routenwahl</b>: kürzester Weg (Dijkstra), Kosten je km nach Tiefenklasse; Variante B mit Tiefengrenze ≈ 4.580 m.</li>
     <li><b>Verluste</b>: Gleichstromwiderstand bei maximaler Temperatur, Nennstrom 1.905 A, Konverter je 0,86 %.</li>
