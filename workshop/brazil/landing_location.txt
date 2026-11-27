@@ -1,0 +1,19 @@
+Cable landing in Brazil, steady 2 GW (firm_supply.py)
+
+Best landing point: north coast of Rio Grande do Norte (RN), around Macau / Guamaré
+  Latitude:   -5.0667
+  Longitude:  -36.4517
+
+Plants within 150 km that deliver at least 2 GW in every hour of 2013:
+  Solar PV:      8.7 GW
+  Onshore wind:  3.5 GW
+  Offshore wind: 0.0 GW
+  Battery:       3.2 GW / 30 GWh
+  Cost:          1,329 M EUR/yr, about 76 EUR/MWh into the cable (European 2035 costs)
+
+Earlier result (landing_point.py, most output within 250 km, no time series):
+  Southern Bahia (BA), near Caravelas
+  Latitude:   -18.2775
+  Longitude:  -39.6499
+
+Hourly time series of the RN landing: results/brazil/firm_supply_timeseries.csv
