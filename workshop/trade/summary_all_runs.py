@@ -22,6 +22,7 @@ RUNS = [
     "de10-trade-v2",
     "de10-trade-cable",
     "de10-trade-cable2050",
+    "de10-trade-cable-fast",
 ]
 YEARS = [2025, 2030, 2035, 2040, 2045, 2050]
 RENEWABLES = [
