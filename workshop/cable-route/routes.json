@@ -1,0 +1,102 @@
+{
+ "cost_Pecem": {
+  "name": "cost_Pecem",
+  "length_km": 8521,
+  "km": {
+   "shelf": 1597,
+   "slope": 2662,
+   "deep": 1301,
+   "abyssal": 2962
+  },
+  "max_depth_m": 5892,
+  "cable_bn": 68.39,
+  "joints_landfall_qual_bn": 0.33,
+  "converters_bn": 1.17,
+  "total_bn": 69.9,
+  "loss_full_load_pct": 34.0,
+  "loss_half_load_pct": 17.9,
+  "lay_days": 2261,
+  "faults_per_year": 0.74,
+  "half_power_days_per_year": 52.2
+ },
+ "cost_Touros": {
+  "name": "cost_Touros",
+  "length_km": 8833,
+  "km": {
+   "shelf": 1616,
+   "slope": 3786,
+   "deep": 1134,
+   "abyssal": 2297
+  },
+  "max_depth_m": 4923,
+  "cable_bn": 66.65,
+  "joints_landfall_qual_bn": 0.33,
+  "converters_bn": 1.17,
+  "total_bn": 68.2,
+  "loss_full_load_pct": 35.5,
+  "loss_half_load_pct": 18.6,
+  "lay_days": 2241,
+  "faults_per_year": 0.81,
+  "half_power_days_per_year": 54.3
+ },
+ "cost_SaoLuis": {
+  "name": "cost_SaoLuis",
+  "length_km": 8816,
+  "km": {
+   "shelf": 1676,
+   "slope": 2690,
+   "deep": 1329,
+   "abyssal": 3121
+  },
+  "max_depth_m": 6028,
+  "cable_bn": 71.05,
+  "joints_landfall_qual_bn": 0.33,
+  "converters_bn": 1.17,
+  "total_bn": 72.5,
+  "loss_full_load_pct": 35.1,
+  "loss_half_load_pct": 18.4,
+  "lay_days": 2348,
+  "faults_per_year": 0.77,
+  "half_power_days_per_year": 54.2
+ },
+ "shallow": {
+  "name": "shallow",
+  "length_km": 9104,
+  "km": {
+   "shelf": 1985,
+   "slope": 3704,
+   "deep": 1331,
+   "abyssal": 2084
+  },
+  "max_depth_m": 4576,
+  "cable_bn": 67.92,
+  "joints_landfall_qual_bn": 0.33,
+  "converters_bn": 1.17,
+  "total_bn": 69.4,
+  "loss_full_load_pct": 36.2,
+  "loss_half_load_pct": 19.0,
+  "lay_days": 2265,
+  "faults_per_year": 0.89,
+  "half_power_days_per_year": 57.1
+ },
+ "minabyss": {
+  "name": "minabyss",
+  "length_km": 9675,
+  "km": {
+   "shelf": 2030,
+   "slope": 3936,
+   "deep": 2078,
+   "abyssal": 1631
+  },
+  "max_depth_m": 4819,
+  "cable_bn": 70.13,
+  "joints_landfall_qual_bn": 0.34,
+  "converters_bn": 1.17,
+  "total_bn": 71.6,
+  "loss_full_load_pct": 38.5,
+  "loss_half_load_pct": 20.1,
+  "lay_days": 2369,
+  "faults_per_year": 0.93,
+  "half_power_days_per_year": 59.1
+ }
+}

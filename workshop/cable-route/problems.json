@@ -1,0 +1,53 @@
+{
+ "slides": [
+  {
+   "title": "Wichtigste Faktoren (1/2): Technik",
+   "rows": [
+    ["Seetiefe (bis 4.400–6.000 m)",
+     "Beim Verlegen hängt das Kabel vom Schiff bis zum Grund: Die Zugkraft ≈ Gewicht × Tiefe [A], also ~150 t pro Kabel bei 6.000 m [D]. Dazu kommen ≈ 600 bar Wasserdruck auf Isolierung und Muffen [A]. Verlegt wurde bisher bis 2.150 m, geprüft bis 3.000 m [D].",
+     "Qualifizierungsprogramm für ≈ 4.500 m (einmalige Kosten, ein Zuschuss von 41,75 Mio. € ist in Aussicht) [D]; leichte Armierung aus Verbundwerkstoff [D]; Route mit geringster Maximaltiefe (B) [D]."],
+    ["Länge und Verluste (8.500–9.100 km)",
+     "Mehr als zehnmal länger als die längsten heutigen HVDC-Seekabel (≈ 750 km) [A]. Bei 2 GW und 525 kV gehen bei Volllast ≈ 35 % der Leistung verloren [D].",
+     "Höhere Spannung oder größerer Leiterquerschnitt [A]; geringere Übertragungsleistung, Betrieb in Teillast [D]."],
+    ["Reparaturen",
+     "Ein Fehler in 4–6 km Tiefe: Das Kabel muss vom Grund gehoben, an Bord gemufft und wieder abgelegt werden; das können nur wenige Spezialschiffe [A]. Eine Reparatur in der Tiefsee dauert mehrere Monate, also ≈ 55 Tage/Jahr mit halber Leistung [D].",
+     "Reparaturvertrag mit reserviertem Schiff, Ersatzkabel und Muffen auf Lager, Fehlerortung über Glasfaser im Kabel [A]; der Bipol läuft mit halber Leistung weiter [D]."],
+    ["Beide Pole in einem Bündel",
+     "Beide Kabel werden als ein Bündel verlegt [D]. Ein Anker- oder Schleppnetzschaden trifft dann beide zugleich, und die ganze Verbindung fällt aus, nicht nur die halbe Leistung [A].",
+     "Im flachen Wasser die Pole mit Abstand verlegen und tief eingraben; in der Tiefsee ist das Risiko gering [A]."],
+    ["Bauzeit und Fertigung",
+     "≈ 2.250 Verlegetage, mit einem Schiff also über 6 Jahre; benötigt werden ≈ 17.000–18.000 km Kabel und ≈ 75 Muffen auf See [D]. Fertigungs- und Schiffskapazität sind weltweit knapp [A].",
+     "Mehrere Schiffe parallel, Bau in Abschnitten; Fertigungs- und Schiffszeiten früh vertraglich sichern [A]."],
+    ["Naturgefahren am Meeresboden",
+     "Am Kontinentalhang vor Westafrika und Iberien zerreißen unterseeische Rutschungen und Trübeströme Kabel; vor Iberien liegen Erdbebenzonen [A].",
+     "Meeresboden vor der Routenwahl erkunden; Canyons meiden oder rechtwinklig queren; Reserve für Reparaturen einplanen [A]."],
+    ["Netzanschluss an beiden Enden",
+     "2 GW müssen in Nordost-Brasilien eingesammelt und in Norddeutschland weitertransportiert werden [D]. Das Netz dort ist schon heute oft überlastet [A].",
+     "Anschlussknoten mit Rolle 2 (Brasilien) und Rolle 3 (Deutschland) wählen [D]; nötigen Netzausbau einplanen [A]."]
+   ]
+  },
+  {
+   "title": "Wichtigste Faktoren (2/2): Rahmenbedingungen",
+   "rows": [
+    ["Viele Länder (≈ 10 Staaten, u. a. BR, westafrikanische Staaten, MA, ES, PT, FR, UK, NL, DE)",
+     "Die Zahl der Staaten ist aus dem Routenverlauf geschätzt; Meeresgrenzen liegen nur für Brasilien vor [D]. Jeder Staat genehmigt Trasse und Umweltprüfung in seinen Gewässern nach eigenem Recht. Im Küstenmeer (12 sm) ist seine Zustimmung nötig, in der Wirtschaftszone (AWZ) kann er Auflagen zur Trasse machen. Transitstaaten haben keinen eigenen Nutzen, und manche Gewässer sind umstritten (Westsahara) [A].",
+     "Staatsvertrag zwischen Deutschland und Brasilien unter Einbindung der Transitstaaten; Küstenmeere wo möglich meiden; den Transitstaaten einen Nutzen bieten, z. B. einen Netzabzweig (Multi-Terminal); EU-Förderstatus (PCI/PMI) anstreben [A]."],
+    ["Schiffsverkehr, Fischerei, Anker",
+     "Die meisten Schäden an Seekabeln entstehen im flachen Wasser. Die Route führt durch den Ärmelkanal, eine der meistbefahrenen Meeresstraßen [A].",
+     "Kabel eingraben (in den Kosten enthalten) [D]; Trasse nach Daten zur Schiffsdichte planen (für Brasilien vorhanden) [D]; Schutzzonen mit Überwachung über AIS (Schiffsortung) [A]."],
+    ["Kreuzung bestehender Kabel und Leitungen",
+     "Im Atlantik, im Kanal und in der Nordsee liegen viele Telekom-, Strom- und Gasleitungen. Jede Kreuzung braucht einen Vertrag mit dem Eigentümer und ein Schutzbauwerk [A].",
+     "Kreuzungsverträge früh verhandeln [A]; Leitungsdaten beschaffen, sie fehlen im Datensatz [D]."],
+    ["Umwelt und Meeresökologie",
+     "Schutzgebiete, Kaltwasserkorallen und Seeberge am Hang; Bauarbeiten an den Küsten; eine eigene Umweltprüfung in jedem Staat [A].",
+     "Schutzgebiete umgehen (für Brasilien liegen WDPA-Daten vor) [D]; Bauzeitfenster festlegen; Umweltprüfung zwischen den Staaten abstimmen [A]."],
+    ["Sicherheit und Sabotage",
+     "Kritische Infrastruktur über Tausende km ohne Bewachung; seit 2023 gab es mehrere Vorfälle an Kabeln in der Ostsee [A].",
+     "Überwachung über Glasfaser-Sensorik im Kabel; Zusammenarbeit mit Marine und Küstenwache; ständige Reparaturbereitschaft [A]."],
+    ["Kosten, Finanzierung und Zeitplan",
+     "68–73 Mrd. € stehen einem Budget von 31,4 Mrd. € gegenüber. Die Bauzeit beträgt über 6 Jahre, die Bauzinsen werden aktiviert. Der Abnehmer kann bei mehr als 30 Monaten Verzug aussteigen [D].",
+     "Staatliche Garantie auf 55 % der Kredite (in Diskussion) und Zuschüsse [D]; geringere Leistung oder Bau in Stufen; Zeitpuffer einplanen [A]."]
+   ]
+  }
+ ]
+}
