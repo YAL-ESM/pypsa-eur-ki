@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Role 3: imports and exports for Germany ("B-light").
+# Germany keeps its 10 nodes; six neighbours are modelled with one node each
+# (two for Denmark, whose east and west grids are not synchronous). They get
+# their own plants, renewables, demand and hydro from the same European data,
+# and the same CO2 price and cap as Germany, so prices and trade come out of
+# the model instead of being assumed.
+#
+# Use on top of the workshop config, target first:
+#   pixi run snakemake results/de10-trade/networks/solved_2030.nc -c4 \
+#     --configfile config/config.workshop.yaml config/config.trade.yaml
+#
+# Choice of neighbours: Germany's largest trading partners by physical flows
+# (ENTSO-E Transparency, cross-border physical flows 2023): FR, NL, AT, CH, DK,
+# PL. Left out to save memory: CZ, BE, LU, NO, SE. NO and SE matter for hydro
+# flexibility and are the next candidates if memory allows.
+
+run:
+  name: de10-trade
+
+countries: [DE, FR, NL, PL, DK, AT, CH]
+
+clustering:
+  focus_weights:            # share of the 17 nodes per country, fixed so the
+    DE: 0.58823529          # allocation is exact: 10/17 for Germany, as in the baseline
+    FR: 0.05882353          # 1/17
+    NL: 0.05882353
+    PL: 0.05882353
+    AT: 0.05882353
+    CH: 0.05882353
+    DK: 0.11764706          # 2/17: DK1 (west) and DK2 (east) are separate grids
+  cluster_network:
+    n_clusters: 17
+  temporal:
+    averaging: 3h           # 2h with 17 nodes ran out of memory in 2030 (killed above 6.4 GB of 8 GB)
+
+lines:
+  # With one node per neighbour, every parallel circuit across a border adds up and
+  # the neighbour has no internal limits. At the default 0.7 the six German borders
+  # carried 53 GW in 2025, about twice their commercial capacity (NTC). Approximate
+  # NTCs 2023/24 (ENTSO-E Transparency / JAO, rounded, to be checked): AT 4.9,
+  # CH 4, FR 3, NL 5, PL 2.5, DK 4.5 GW, total about 24 GW. 0.3 of the thermal
+  # rating gives about 23 GW of AC plus 0.6 GW DC. One factor for all borders: CH
+  # stays too high (6 GW), FR too low (1.9 GW).
+  s_max_pu_crossborder: 0.3
+
+solving:
+  options:
+    load_shedding:          # last resort, so a few short hours in the frozen 2025 fleet
+      enable: true          # (DK2 without Sweden: 0.3 GW, ~1 GWh in the year) do not
+      default_cost: 10000   # make the whole year infeasible. EUR/MWh; ACER (2018) puts
+                            # the value of lost load in the EU at several 1000 EUR/MWh.
