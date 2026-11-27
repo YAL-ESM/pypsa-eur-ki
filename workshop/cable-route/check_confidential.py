@@ -56,6 +56,12 @@ needles[f"{de(2 * conv / 1e9, 2)} Mrd"] = "converter cost (derived total)"
 needles[f"{de(conv / 1e6, 0)} Mio"] = "converter cost (derived)"
 needles[f"{de(inst['landfall_cost_eur'] / 1e6, 0)} Mio"] = "landfall cost (derived)"
 needles[f"{de(op['repair_mobilisation_eur'] / 1e6, 1)} Mio"] = "repair mobilisation cost (derived)"
+# machine-readable outputs (JSON, CSV): field names and English number format of the same derived values
+for field in ("converters_bn", "converter_bn", "joints_landfall_qual_bn", "landfall_bn", "cable_bn",
+              "cost_per_km", "eur_per_km", "mio_eur_per_km"):
+    needles[f'"{field}"'] = f"field with confidential cost part ({field})"
+needles[f": {2 * conv / 1e9:.2f}"] = "converter cost (derived total, JSON)"
+needles[f",{2 * conv / 1e9:.2f}"] = "converter cost (derived total, CSV)"
 for k, days in op["repair_days"].items():
     needles[f"{days} Tage"] = f"repair days ({k})"
 for k, c in dc.items():
@@ -77,6 +83,8 @@ for f in files:
     if f.resolve() == YAML.resolve():
         print(f"BLOCK  {f}: this is the supplier data file itself")
         hits += 1
+        continue
+    if f.resolve() == Path(__file__).resolve():  # contains only search terms, no values
         continue
     if f.suffix.lower() in BINARY:
         unchecked.append(f)

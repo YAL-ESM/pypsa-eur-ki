@@ -3,20 +3,20 @@
   {
    "title": "Wichtigste Faktoren (1/2): Technik",
    "rows": [
-    ["Seetiefe (bis 4.400–6.000 m)",
+    ["Seetiefe (bis ≈ 4.600–4.900 m)",
      "Beim Verlegen hängt das Kabel vom Schiff bis zum Grund: Die Zugkraft ≈ Gewicht × Tiefe [A], also ~150 t pro Kabel bei 6.000 m [D]. Dazu kommen ≈ 600 bar Wasserdruck auf Isolierung und Muffen [A]. Verlegt wurde bisher bis 2.150 m, geprüft bis 3.000 m [D].",
      "Qualifizierungsprogramm für ≈ 4.500 m (einmalige Kosten) [D]; leichte Armierung aus Verbundwerkstoff [D]; Route mit geringster Maximaltiefe (B) [D]."],
-    ["Länge und Verluste (8.500–9.100 km)",
-     "Mehr als zehnmal länger als die längsten heutigen HVDC-Seekabel (≈ 750 km) [A]. Bei 2 GW und 525 kV gehen bei Volllast ≈ 35 % der Leistung verloren [D].",
+    ["Länge und Verluste (9.000–9.700 km)",
+     "Mehr als zehnmal länger als die längsten heutigen HVDC-Seekabel (≈ 750 km) [A]. Bei 2 GW und 525 kV gehen bei Volllast ≈ 36–39 % der Leistung verloren [D].",
      "Höhere Spannung oder größerer Leiterquerschnitt [A]; geringere Übertragungsleistung, Betrieb in Teillast [D]."],
     ["Reparaturen",
-     "Ein Fehler in 4–6 km Tiefe: Das Kabel muss vom Grund gehoben, an Bord gemufft und wieder abgelegt werden; das können nur wenige Spezialschiffe [A]. Eine Reparatur in der Tiefsee dauert mehrere Monate, also ≈ 55 Tage/Jahr mit halber Leistung [D].",
+     "Ein Fehler in 4–5 km Tiefe: Das Kabel muss vom Grund gehoben, an Bord gemufft und wieder abgelegt werden; das können nur wenige Spezialschiffe [A]. Eine Reparatur in der Tiefsee dauert mehrere Monate, also ≈ 55–60 Tage/Jahr mit halber Leistung [D].",
      "Reparaturvertrag mit reserviertem Schiff, Ersatzkabel und Muffen auf Lager, Fehlerortung über Glasfaser im Kabel [A]; der Bipol läuft mit halber Leistung weiter [D]."],
     ["Beide Pole in einem Bündel",
      "Beide Kabel werden als ein Bündel verlegt [D]. Ein Anker- oder Schleppnetzschaden trifft dann beide zugleich, und die ganze Verbindung fällt aus, nicht nur die halbe Leistung [A].",
      "Im flachen Wasser die Pole mit Abstand verlegen und tief eingraben; in der Tiefsee ist das Risiko gering [A]."],
     ["Bauzeit und Fertigung",
-     "≈ 2.250 Verlegetage, mit einem Schiff also über 6 Jahre; benötigt werden ≈ 17.000–18.000 km Kabel und zahlreiche Muffen auf See [D]. Fertigungs- und Schiffskapazität sind weltweit knapp [A].",
+     "≈ 2.250–2.400 Verlegetage, mit einem Schiff also über 6 Jahre; benötigt werden ≈ 18.000–19.500 km Kabel und zahlreiche Muffen auf See [D]. Fertigungs- und Schiffskapazität sind weltweit knapp [A].",
      "Mehrere Schiffe parallel, Bau in Abschnitten; Fertigungs- und Schiffszeiten früh vertraglich sichern [A]."],
     ["Naturgefahren am Meeresboden",
      "Am Kontinentalhang vor Westafrika und Iberien zerreißen unterseeische Rutschungen und Trübeströme Kabel; vor Iberien liegen Erdbebenzonen [A].",
@@ -45,7 +45,7 @@
      "Kritische Infrastruktur über Tausende km ohne Bewachung; seit 2023 gab es mehrere Vorfälle an Kabeln in der Ostsee [A].",
      "Überwachung über Glasfaser-Sensorik im Kabel; Zusammenarbeit mit Marine und Küstenwache; ständige Reparaturbereitschaft [A]."],
     ["Kosten, Finanzierung und Zeitplan",
-     "Die Investition beträgt 68–73 Mrd. €. Die Bauzeit beträgt über 6 Jahre, in dieser Zeit fallen Finanzierungskosten an [A]. Ein längerer Verzug gefährdet die Abnahme [D].",
+     "Die Investition beträgt ≈ 69–72 Mrd. €. Die Bauzeit beträgt über 6 Jahre, in dieser Zeit fallen Finanzierungskosten an [A]. Ein längerer Verzug gefährdet die Abnahme [D].",
      "Öffentliche Förderung und Garantien prüfen; geringere Leistung oder Bau in Stufen; Zeitpuffer einplanen [A]."]
    ]
   }

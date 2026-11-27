@@ -32,9 +32,10 @@ for f,(title,step) in files.items():
     fig.tight_layout(); fig.savefig(f"{outdir}/map_{f.replace('.nc','')}.png", dpi=150); plt.close(fig)
 # routes
 R = np.load(routes); meta = json.load(open(routes.replace(".npz",".json")))
-SEL = [("cost_Touros","A  Natal/Touros – kostenminimal","#2a78d6"),
-       ("shallow","B  Natal/Touros – geringste Maximaltiefe","#eb6834"),
-       ("cost_Pecem","C  Pecém – kürzeste/kostengünstige","#1baf7a")]
+# all three start at the landing chosen by role 2 (Macau/Guamaré, RN); see routes.py
+SEL = [("cost_Macau","A  kostenminimal","#2a78d6"),
+       ("shallow","B  geringste Maximaltiefe","#eb6834"),
+       ("minabyss","C  wenigste km tiefer als 3.000 m","#1baf7a")]
 ds = xr.open_dataset(f"{datadir}/gebco_2025_atlantic_30s.nc")
 z = ds.elevation.values; lon, lat = ds.lon.values, ds.lat.values
 # depth-class map in neutral greys so routes stand out
@@ -51,7 +52,7 @@ for (key,label,col),lw in zip(SEL[::-1],[7,4.5,2]):
     ax.plot(p[:,1],p[:,0],color=col,lw=lw,solid_capstyle="round",
             label=f"{label}: {de(r['length_km'])} km, {de(r['total_bn'],1)} Mrd. €, max. {de(r['max_depth_m'])} m")
 h,l = ax.get_legend_handles_labels(); h,l = h[::-1],l[::-1]
-for (la,lo,n) in [(-5.15,-35.45,"Touros/Natal"),(-3.55,-38.8,"Pecém"),(53.85,8.1,"Deutsche Bucht")]:
+for (la,lo,n) in [(-5.0667,-36.4517,"Macau/Guamaré (RN)"),(53.85,8.1,"Deutsche Bucht")]:
     ax.plot(lo,la,"o",ms=8,mfc=INK,mec="white",mew=2,zorder=5)
     ax.annotate(n,(lo,la),xytext=(8,-4),textcoords="offset points",color=INK,fontsize=9)
 from matplotlib.patches import Patch
@@ -60,7 +61,7 @@ l += ["Schelf 0–500 m (Kosten/km ×1,2)","Hang 500–1.500 m (×1,0)","Tiefsee
 ax.legend(h,l,loc="upper left",fontsize=8,frameon=True,facecolor=SURF,edgecolor=INK2,framealpha=.95)
 ax.set_xlim(-50,15); ax.set_ylim(-9,60); ax.set_aspect(1/np.cos(np.radians(25)))
 ax.set_xlabel("Längengrad"); ax.set_ylabel("Breitengrad")
-ax.set_title("Drei Kandidatenrouten Brasilien – Deutschland (2 GW, 525 kV)", loc="left", color=INK)
+ax.set_title("Drei Routen ab Macau/Guamaré (RN) – Deutsche Bucht (2 GW, 525 kV)", loc="left", color=INK)
 fig.tight_layout(); fig.savefig(f"{outdir}/map_routes.png",dpi=150); plt.close(fig)
 # depth profiles: small multiples, one axis each, shared scale
 fig, axs = plt.subplots(3,1,figsize=(10,7),sharex=True,sharey=True)

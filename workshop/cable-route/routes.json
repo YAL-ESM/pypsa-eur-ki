@@ -1,23 +1,34 @@
 {
- "cost_Pecem": {
-  "name": "cost_Pecem",
-  "length_km": 8521,
+ "cost_Macau": {
+  "name": "cost_Macau",
+  "length_km": 8956,
   "km": {
-   "shelf": 1597,
-   "slope": 2662,
-   "deep": 1301,
-   "abyssal": 2962
+   "shelf": 1605,
+   "slope": 3803,
+   "deep": 1377,
+   "abyssal": 2171
   },
-  "max_depth_m": 5892,
-  "cable_bn": 68.39,
-  "joints_landfall_qual_bn": 0.33,
-  "converters_bn": 1.17,
-  "total_bn": 69.9,
-  "loss_full_load_pct": 34.0,
-  "loss_half_load_pct": 17.9,
-  "lay_days": 2261,
-  "faults_per_year": 0.74,
-  "half_power_days_per_year": 52.2
+  "max_depth_m": 4923,
+  "total_bn": 68.6,
+  "share_pct": {
+   "supply": 78,
+   "reserve": 15,
+   "burial": 4,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 34
+  },
+  "corridor_bn": [
+   61,
+   93
+  ],
+  "loss_full_load_pct": 36.0,
+  "loss_half_load_pct": 18.9,
+  "lay_days": 2264,
+  "faults_per_year": 0.81,
+  "half_power_days_per_year": 54.5,
+  "fom_mio": 250,
+  "repair_mio": 12
  },
  "cost_Touros": {
   "name": "cost_Touros",
@@ -29,15 +40,57 @@
    "abyssal": 2297
   },
   "max_depth_m": 4923,
-  "cable_bn": 66.65,
-  "joints_landfall_qual_bn": 0.33,
-  "converters_bn": 1.17,
   "total_bn": 68.2,
+  "share_pct": {
+   "supply": 78,
+   "reserve": 15,
+   "burial": 4,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 37
+  },
+  "corridor_bn": [
+   60,
+   93
+  ],
   "loss_full_load_pct": 35.5,
   "loss_half_load_pct": 18.6,
   "lay_days": 2241,
   "faults_per_year": 0.81,
-  "half_power_days_per_year": 54.3
+  "half_power_days_per_year": 54.3,
+  "fom_mio": 250,
+  "repair_mio": 12
+ },
+ "cost_Pecem": {
+  "name": "cost_Pecem",
+  "length_km": 8521,
+  "km": {
+   "shelf": 1597,
+   "slope": 2662,
+   "deep": 1301,
+   "abyssal": 2962
+  },
+  "max_depth_m": 5892,
+  "total_bn": 69.9,
+  "share_pct": {
+   "supply": 77,
+   "reserve": 16,
+   "burial": 4,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 46
+  },
+  "corridor_bn": [
+   61,
+   98
+  ],
+  "loss_full_load_pct": 34.0,
+  "loss_half_load_pct": 17.9,
+  "lay_days": 2261,
+  "faults_per_year": 0.74,
+  "half_power_days_per_year": 52.2,
+  "fom_mio": 260,
+  "repair_mio": 11
  },
  "cost_SaoLuis": {
   "name": "cost_SaoLuis",
@@ -49,54 +102,149 @@
    "abyssal": 3121
   },
   "max_depth_m": 6028,
-  "cable_bn": 71.05,
-  "joints_landfall_qual_bn": 0.33,
-  "converters_bn": 1.17,
   "total_bn": 72.5,
+  "share_pct": {
+   "supply": 77,
+   "reserve": 16,
+   "burial": 4,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 47
+  },
+  "corridor_bn": [
+   64,
+   102
+  ],
   "loss_full_load_pct": 35.1,
   "loss_half_load_pct": 18.4,
   "lay_days": 2348,
   "faults_per_year": 0.77,
-  "half_power_days_per_year": 54.2
+  "half_power_days_per_year": 54.2,
+  "fom_mio": 260,
+  "repair_mio": 11
+ },
+ "cost_Caravelas": {
+  "name": "cost_Caravelas",
+  "length_km": 10535,
+  "km": {
+   "shelf": 1819,
+   "slope": 5277,
+   "deep": 1139,
+   "abyssal": 2300
+  },
+  "max_depth_m": 4923,
+  "total_bn": 78.4,
+  "share_pct": {
+   "supply": 79,
+   "reserve": 14,
+   "burial": 4,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 32
+  },
+  "corridor_bn": [
+   69,
+   105
+  ],
+  "loss_full_load_pct": 42.3,
+  "loss_half_load_pct": 22.0,
+  "lay_days": 2610,
+  "faults_per_year": 0.98,
+  "half_power_days_per_year": 64.7,
+  "fom_mio": 280,
+  "repair_mio": 14
+ },
+ "short": {
+  "name": "short",
+  "length_km": 8221,
+  "km": {
+   "shelf": 1408,
+   "slope": 23,
+   "deep": 419,
+   "abyssal": 6371
+  },
+  "max_depth_m": 6123,
+  "total_bn": 83.7,
+  "share_pct": {
+   "supply": 75,
+   "reserve": 19,
+   "burial": 3,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 82
+  },
+  "corridor_bn": [
+   72,
+   129
+  ],
+  "loss_full_load_pct": 32.3,
+  "loss_half_load_pct": 17.0,
+  "lay_days": 2597,
+  "faults_per_year": 0.57,
+  "half_power_days_per_year": 51.4,
+  "fom_mio": 300,
+  "repair_mio": 8
  },
  "shallow": {
   "name": "shallow",
-  "length_km": 9104,
+  "length_km": 9139,
   "km": {
-   "shelf": 1985,
-   "slope": 3704,
-   "deep": 1331,
+   "shelf": 1983,
+   "slope": 3692,
+   "deep": 1380,
    "abyssal": 2084
   },
   "max_depth_m": 4576,
-  "cable_bn": 67.92,
-  "joints_landfall_qual_bn": 0.33,
-  "converters_bn": 1.17,
-  "total_bn": 69.4,
-  "loss_full_load_pct": 36.2,
+  "total_bn": 69.7,
+  "share_pct": {
+   "supply": 78,
+   "reserve": 14,
+   "burial": 5,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 32
+  },
+  "corridor_bn": [
+   62,
+   94
+  ],
+  "loss_full_load_pct": 36.4,
   "loss_half_load_pct": 19.0,
-  "lay_days": 2265,
+  "lay_days": 2280,
   "faults_per_year": 0.89,
-  "half_power_days_per_year": 57.1
+  "half_power_days_per_year": 57.2,
+  "fom_mio": 250,
+  "repair_mio": 13
  },
  "minabyss": {
   "name": "minabyss",
-  "length_km": 9675,
+  "length_km": 9710,
   "km": {
-   "shelf": 2030,
-   "slope": 3936,
-   "deep": 2078,
+   "shelf": 2027,
+   "slope": 3924,
+   "deep": 2128,
    "abyssal": 1631
   },
   "max_depth_m": 4819,
-  "cable_bn": 70.13,
-  "joints_landfall_qual_bn": 0.34,
-  "converters_bn": 1.17,
-  "total_bn": 71.6,
-  "loss_full_load_pct": 38.5,
-  "loss_half_load_pct": 20.1,
-  "lay_days": 2369,
+  "total_bn": 71.9,
+  "share_pct": {
+   "supply": 78,
+   "reserve": 14,
+   "burial": 5,
+   "lay": 1,
+   "fixed": 2,
+   "abyssal": 25
+  },
+  "corridor_bn": [
+   64,
+   96
+  ],
+  "loss_full_load_pct": 38.6,
+  "loss_half_load_pct": 20.2,
+  "lay_days": 2377,
   "faults_per_year": 0.93,
-  "half_power_days_per_year": 59.1
+  "half_power_days_per_year": 59.2,
+  "fom_mio": 260,
+  "repair_mio": 14
  }
 }

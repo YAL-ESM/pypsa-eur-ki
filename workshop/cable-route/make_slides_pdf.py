@@ -28,9 +28,18 @@ def de(x, nd=0):
     return f"{x:,.{nd}f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
-land = {"cost_Touros": "Touros/Natal", "cost_Pecem": "Pecém", "cost_SaoLuis": "São Luís"}
-tots = [R[k]["total_bn"] for k in land]
-A, B, C = R["cost_Touros"], R["shallow"], R["cost_Pecem"]
+# Landing chosen by role 2 (workshop/brazil/landing_location.txt); A, B, C all start there.
+land = {"cost_Macau": "Macau/Guamaré (RN), gewählt", "cost_Touros": "Touros/Natal (RN)", "cost_Pecem": "Pecém (CE)",
+        "cost_SaoLuis": "São Luís (MA)", "cost_Caravelas": "Caravelas (BA)"}
+A, B, C = R["cost_Macau"], R["shallow"], R["minabyss"]
+ABC = (A, B, C)
+SHORT = R["short"]
+HDR = ["A · kostenminimal", "B · geringste Maximaltiefe", "C · wenigste km > 3.000 m"]
+HDR_S = ["A · günstig", "B · flach", "C · wenig Tiefsee"]
+tots = [r["total_bn"] for r in ABC]
+rng = lambda key, nd=0: f"{de(min(r[key] for r in ABC), nd)}–{de(max(r[key] for r in ABC), nd)}"
+dpct = lambda r: de(100 * (r["total_bn"] / A["total_bn"] - 1))  # cost difference to A in %
+r5 = lambda x: int(5 * round(x / 5))
 P = json.loads((d / "problems.json").read_text())
 N_SLIDES = 17 + len(P["slides"])
 LEGEND = ("[D] = aus den Workshop-Daten oder daraus berechnet   ·   "
@@ -121,7 +130,7 @@ with PdfPages(d / "slides.pdf") as pdf:
     s.ax.text(0.9, 2.6, "HVDC-Kabel Brasilien – Deutschland", fontsize=36, fontweight="bold", color=INK, va="top")
     s.ax.text(0.9, 3.5, "Route, Kosten und technische Machbarkeit", fontsize=20, color=INK2, va="top")
     s.text(0.9, 4.6, "Rolle 1 · Kabel-Techno-Ökonomie · Stand 27.11.2026\n"
-                     "Basis: 2 GW Bipol, 525 kV · Preisbasis 2025 · Anlandepunkt in Brasilien noch offen", 13, color=INK2)
+                     "Basis: 2 GW Bipol, 525 kV · Preisbasis 2025 · Anlandung in Brasilien: Macau/Guamaré (RN)", 13, color=INK2)
     s.save()
 
     # 1 key messages, conclusions and levers
@@ -136,7 +145,7 @@ with PdfPages(d / "slides.pdf") as pdf:
     ], size=14.5, width=5.8, gap=0.25, num=True)
     s.text(7.0, 1.35, "Folgerungen und Hebel", 17, color=ACC, weight="bold")
     s.bullets(7.0, 1.9, [
-        "Die Route ist kaum ein Hebel: Die Varianten unterscheiden sich um ≈ 2 % in den Kosten. [D]",
+        f"Anlandung Macau/Guamaré (RN) steht fest (Rolle 2). Die Routen ab dort unterscheiden sich um ≈ {dpct(C)} % in den Kosten. [D]",
         "Voraussetzung für jede Variante: ein Kabel, das für ≈ 4.500 m qualifiziert ist. [D]",
         "Verluste senken: höhere Spannung oder größerer Querschnitt [A], Teillastbetrieb [D].",
         "Bauzeit: mehrere Schiffe parallel, Bau in Abschnitten. [A]",
@@ -150,12 +159,12 @@ with PdfPages(d / "slides.pdf") as pdf:
          "Qualifizierung für ≈ 4.500 m; flachste Route B. [D]"],
         ["Kosten und Finanzierung", f"{de(min(tots),1)}–{de(max(tots),1)} Mrd. € Investition für Kabel und Konverter. [D]",
          "Öffentliche Förderung und Garantien prüfen; geringere Leistung oder Bau in Stufen. [A]"],
-        ["Verluste", "≈ 35 % bei Volllast, ≈ 18 % bei halber Last. [D]",
+        ["Verluste", f"≈ {rng('loss_full_load_pct')} % bei Volllast, ≈ {rng('loss_half_load_pct')} % bei halber Last. [D]",
          "Höhere Spannung oder größerer Querschnitt [A]; Teillastbetrieb. [D]"],
         ["Bauzeit und Verzug", "Gut 6 Jahre mit einem Schiff; ein längerer Verzug gefährdet die Abnahme. [D] "
          "Schiffe und Fertigung sind knapp. [A]",
          "Mehrere Schiffe, Bau in Abschnitten, Kapazitäten früh sichern. [A]"],
-        ["Schäden und Reparaturen", "≈ 55 Tage/Jahr mit halber Leistung. [D] Anker und Fischerei im Flachwasser, "
+        ["Schäden und Reparaturen", "≈ 55–60 Tage/Jahr mit halber Leistung. [D] Anker und Fischerei im Flachwasser, "
          "Hangrutschungen, Sabotage; im Bündel fallen beide Pole zugleich aus. [A]",
          "Reparaturvertrag mit reserviertem Schiff, Ersatzteile auf Lager; Pole im Flachen getrennt verlegen; Überwachung. [A]"],
         ["Genehmigung in ≈ 10 Staaten", "Eigenes Recht und Umweltprüfung je Staat; Transitstaaten haben keinen Nutzen; "
@@ -170,43 +179,47 @@ with PdfPages(d / "slides.pdf") as pdf:
     # 3 proposed routes with assessment
     s = Slide(pdf, 4, "Vorgeschlagene Routen und Bewertung")
     s.image("map_routes.png", 0.4, 1.15, 5.2, 5.8)
-    ABC = (A, B, C)
     y = s.table(5.75, 1.2, [1.45, 1.95, 1.95, 1.85], [
-        ["[D]", "A · Touros, kostenminimal", "B · Touros, geringste Tiefe", "C · Pecém, kürzeste"],
-        ["Leistung", *["2 GW Bipol" for r in ABC]],
+        ["[D]", *HDR],
         ["Länge", *[f"{de(r['length_km'])} km" for r in ABC]],
         ["Investition", *[f"{de(r['total_bn'],1)} Mrd. €" for r in ABC]],
         ["Max. Tiefe", *[f"{de(r['max_depth_m'])} m" for r in ABC]],
         ["> 3.000 m", *[f"{de(r['km']['abyssal'])} km" for r in ABC]],
         ["Verlust Volllast", *[f"{de(r['loss_full_load_pct'])} %" for r in ABC]],
         ["Bauzeit, 1 Schiff", *[f"{de(r['lay_days']/365,1)} Jahre" for r in ABC]],
-        ["+", "am günstigsten", "am flachsten, kürzeste Strecke > 3.000 m", "am kürzesten, geringste Verluste"],
-        ["−", "quert die Biskaya mit fast 4.900 m", "am längsten, mehr Flachwasser mit Schiffsverkehr [A]",
-         "am tiefsten, fast 3.000 km > 3.000 m"],
-        ["Bewertung", "Rückfalloption, wenn die Biskaya qualifiziert wird", "Vorschlag: technisch am wenigsten extrem, ≈ 2 % teurer",
-         "nur bei Anlandung in Pecém; höchstes Tiefenrisiko"],
-    ], size=10, hl_rows=(10,), bold_cells={(8, 0), (9, 0), (10, 0), (10, 2)})
-    s.text(5.75, y, "Alle Werte für 2 GW (Bipol, 525 kV, zwei Kabel mit je ≈ 1 GW). Anlandepunkte sind Beispiele. [D]", 10, 7.4, INK2)
+        ["+", "am günstigsten, am kürzesten, geringste Verluste", f"am flachsten (max. {de(B['max_depth_m'])} m)",
+         "am wenigsten km > 3.000 m; meidet die tiefe Biskaya"],
+        ["−", f"quert die Biskaya mit fast {de(r5(A['max_depth_m']/10)*10)} m",
+         f"≈ {dpct(B)} % teurer; mehr Flachwasser mit Schiffsverkehr [A]",
+         f"≈ {dpct(C)} % teurer, am längsten, höchste Verluste"],
+        ["Bewertung", f"Rückfalloption, wenn ≈ {de(r5(A['max_depth_m']/10)*10)} m qualifiziert werden",
+         f"Vorschlag: geringste Tiefe, die qualifiziert werden muss; ≈ {dpct(B)} % teurer",
+         "Alternative, wenn wenige Reparaturen in großer Tiefe wichtiger sind als Kosten"],
+    ], size=9.5, hl_rows=(9,), bold_cells={(7, 0), (8, 0), (9, 0), (9, 2)})
+    s.text(5.75, y, f"2 GW Bipol, 525 kV, ab Macau/Guamaré (RN). Verworfen: kürzeste Route, {de(SHORT['length_km'])} km, "
+                    f"{de(SHORT['total_bn'],1)} Mrd. €, {de(SHORT['km']['abyssal'])} km > 3.000 m. [D]", 9.5, 7.4, INK2)
     s.save()
 
     # 3b cost breakdown and corridor (rounded aggregates only, no supplier prices)
     s = Slide(pdf, None, "Woher die Kosten kommen und wie unsicher sie sind (2 GW)")
     s.text(0.65, 1.25, "Anteile an der Investition, gerundet [D]", 12.5, 6, weight="bold")
     y = s.table(0.65, 1.6, [2.6, 1.15, 1.25, 1.1], [
-        ["Kostenart", "A · Touros", "B · Touros flach", "C · Pecém"],
-        ["Kabel: Lieferung", "≈ 80 %", "≈ 80 %", "≈ 75 %"],
-        ["Reserve (in den Daten enthalten)", "≈ 15 %", "≈ 15 %", "≈ 15 %"],
-        ["Eingraben auf dem Schelf", "≈ 4 %", "≈ 5 %", "≈ 4 %"],
-        ["Verlegung", "≈ 1 %", "≈ 1 %", "≈ 1 %"],
-        ["Konverter, Muffen, Anlandung", "≈ 2 %", "≈ 2 %", "≈ 2 %"],
-        ["davon Abschnitte > 3.000 m", "≈ 35 %", "≈ 30 %", "≈ 45 %"],
-    ], size=11, bold_cells={(i, 0) for i in range(1, 7)} | {(6, 3)})
+        ["Kostenart", *HDR_S],
+        ["Kabel: Lieferung", *[f"≈ {r5(r['share_pct']['supply'])} %" for r in ABC]],
+        ["Reserve (in den Daten enthalten)", *[f"≈ {r5(r['share_pct']['reserve'])} %" for r in ABC]],
+        ["Eingraben auf dem Schelf", *[f"≈ {r['share_pct']['burial']} %" for r in ABC]],
+        ["Verlegung", *[f"≈ {r['share_pct']['lay']} %" for r in ABC]],
+        ["Konverter, Muffen, Anlandung", *[f"≈ {r['share_pct']['fixed']} %" for r in ABC]],
+        ["davon Abschnitte > 3.000 m", *[f"≈ {r5(r['share_pct']['abyssal'])} %" for r in ABC]],
+    ], size=11, bold_cells={(i, 0) for i in range(1, 7)} | {(6, 1 + max(range(3), key=lambda i: ABC[i]['share_pct']['abyssal']))})
     s.bullets(0.65, y + 0.15, [
         "Fast alles ist Kabellieferung. Verlegung und Konverter sind kaum ein Hebel. [D]",
         "Der größte Block sind die Abschnitte über 3.000 m, für die es nur eine Designstudie gibt. [D]",
     ], size=12.5, width=6.1, gap=0.12)
     s.text(7.1, 1.25, "Kostenkorridor in Mrd. € [A, Basis D]", 12.5, 6, weight="bold")
-    CORR = [("A", 60, A, 93), ("B", 61, B, 94), ("C", 61, C, 98)]
+    CORR = [(n, r["corridor_bn"][0], r, r["corridor_bn"][1]) for n, r in zip("ABC", ABC)]
+    up = [100 * (hi / r["total_bn"] - 1) for _, _, r, hi in CORR]
+    worst = max(range(3), key=lambda i: up[i])
     y = s.table(7.1, 1.6, [0.9, 1.15, 1.15, 1.3, 1.25],
                 [["Route", "günstig", "Basis", "ungünstig", "Aufschlag"]] +
                 [[n, f"≈ {lo}", de(r["total_bn"], 1), f"≈ {hi}", f"+{de(100*(hi/r['total_bn']-1))} %"] for n, lo, r, hi in CORR],
@@ -218,8 +231,10 @@ with PdfPages(d / "slides.pdf") as pdf:
         ["Kabel > 3.000 m, nur Designstudie", "−15 %", "+60 %"],
         ["Konverter, Muffen, Anlandung", "−10 %", "+30 %"],
     ], size=10.5, right=(1, 2))
-    y = s.text(7.1, y + 0.05, "Ungünstiger Fall ≈ +35–40 %, also 93–98 Mrd. €.", 11, 5.8, weight="bold")
-    s.text(7.1, y, "Route C trifft es am stärksten, weil fast die Hälfte ihrer Kosten über 3.000 m liegt. [A] "
+    y = s.text(7.1, y + 0.05, f"Ungünstiger Fall ≈ +{de(min(up))}–{de(max(up))} %, also "
+                              f"{min(c[3] for c in CORR)}–{max(c[3] for c in CORR)} Mrd. €.", 11, 5.8, weight="bold")
+    s.text(7.1, y, f"Route {'ABC'[worst]} trifft es relativ am stärksten, weil bei ihr der größte Anteil der Kosten "
+                   f"(≈ {r5(ABC[worst]['share_pct']['abyssal'])} %) über 3.000 m liegt. [A] "
                    "Die Spanne liegt im üblichen Rahmen einer Schätzung in der Machbarkeitsphase. [A] Die Reserve von ≈ 15 % "
                    "ist schon in der Basis enthalten. [D] Nicht enthalten: Finanzierungskosten während der Bauzeit, Preissteigerung ab 2025, "
                    "Netzanschluss an Land in Deutschland. [D]", 10, 5.8, INK2)
@@ -227,9 +242,9 @@ with PdfPages(d / "slides.pdf") as pdf:
 
     # 3c repairs (rounded annual aggregates only)
     s = Slide(pdf, None, "Reparaturen: wie oft und was sie kosten (2 GW)")
-    REP = [(A, 12, "0,5"), (B, 13, "0,5"), (C, 11, "0,4")]
+    REP = [(r, r["repair_mio"], de(40 * r["repair_mio"] / 1000, 1)) for r in ABC]
     y = s.table(0.65, 1.35, [2.5, 1.35, 1.35, 1.35], [
-        ["[D]", "A · Touros", "B · Touros flach", "C · Pecém"],
+        ["[D]", *HDR_S],
         ["Fehler pro Jahr", *[de(r["faults_per_year"], 1) for r, *_ in REP]],
         ["Fehler in 40 Jahren", *[f"≈ {de(40*r['faults_per_year'])}" for r, *_ in REP]],
         ["Tage/Jahr mit halber Leistung", *[f"≈ {de(r['half_power_days_per_year'])}" for r, *_ in REP]],
@@ -253,7 +268,7 @@ with PdfPages(d / "slides.pdf") as pdf:
     fmt = lambda v, u: de(v, 1) if u == "Mrd. €" else (str(v) if u == "Jahr" else de(v))
     CR = CO.rows(d)
     y = s.table(0.5, 1.25, [4.1, 0.95, 1.2, 1.4, 1.2, 1.35, 2.1],
-                [["Posten", "Art", "A · Touros", "B · Touros flach", "C · Pecém", "Einheit", "Herkunft"]] +
+                [["Posten", "Art", *HDR_S, "Einheit", "Herkunft"]] +
                 [[n, a, *[fmt(v, u) for v in vals], u, HK[hk]] for n, a, u, vals, hk, _ in CR],
                 size=10.5, right=(2, 3, 4), hl_rows=(4,),
                 bold_cells={(1, k) for k in range(5)} | {(4, k) for k in range(5)})
@@ -291,9 +306,9 @@ with PdfPages(d / "slides.pdf") as pdf:
                         "~150 t pro Kabel bei 6.000 m. Dafür braucht es eine leichtere Armierung, die nicht erprobt ist. [D]"],
         ["Reparatur & Verfügbarkeit", "Ein Fehler legt einen Pol still, es bleibt halbe Leistung. Die Reparatur dauert je nach "
                                       "Tiefe Wochen (Schelf) bis mehrere Monate (Tiefsee). Ergebnis: ≈ 0,8–0,9 Fehler/Jahr und "
-                                      "≈ 55 Tage/Jahr mit halber Leistung. [D]"],
+                                      "≈ 55–60 Tage/Jahr mit halber Leistung. [D]"],
         ["Bauzeit", "Je tiefer, desto langsamer wird verlegt; dazu kommen Wetterausfall und Muffen auf See. "
-                    "Das sind ≈ 2.250–2.350 Verlegetage je nach Route, mit einem Schiff also gut 6 Jahre. [D]"],
+                    "Das sind ≈ 2.250–2.400 Verlegetage je nach Route, mit einem Schiff also gut 6 Jahre. [D]"],
         ["Nicht in den Daten", "Schiffsverkehr, bestehende Kabel und Schutzgebiete außerhalb Brasiliens. [D] Die Route quert die "
                                "Meereszonen von ≈ 10 Staaten, das ist auch eine politische Frage. [A]"],
     ], size=13, bold_cells={(i, 0) for i in range(1, 5)})
@@ -325,7 +340,7 @@ with PdfPages(d / "slides.pdf") as pdf:
               fontsize=16, va="center", color=INK)
     y = s.bullets(0.7, 2.5, [
         "Bei 2 GW und 525 kV: ≈ 4 % pro 1.000 km (Kupfer auf dem Schelf: 3,1 %), dazu 1,7 % in den Konvertern. [D]",
-        "Bei ≈ 8.500–9.100 km sind das ≈ 34–36 % bei Volllast und ≈ 18–19 % bei halber Last. [D]",
+        f"Bei {rng('length_km')} km sind das ≈ {rng('loss_full_load_pct')} % bei Volllast und ≈ {rng('loss_half_load_pct')} % bei halber Last. [D]",
         "Halbe Leistung ergibt halben relativen Verlust. [D] Ein größerer Leiterquerschnitt senkt den Widerstand. [A]",
         "Höhere Spannung, z. B. 800 statt 525 kV, ergäbe ≈ 43 % der Verluste. [A]",
     ], size=17, width=11.8, gap=0.25)
@@ -347,7 +362,7 @@ with PdfPages(d / "slides.pdf") as pdf:
         ["Leistung", "Kosten und Verluste"],
         ["Weniger, z. B. 1 GW", "Dünnere Kabel, also billiger, aber kaum halb so teuer: Isolierung, Armierung, Verlegung und "
                                 "Muffen bleiben. Verluste in % bei passendem Querschnitt etwa gleich. [A]"],
-        ["2 GW-Kabel, halb ausgelastet", "Investition gleich, Verluste ≈ 18 statt ≈ 35 %. [D]"],
+        ["2 GW-Kabel, halb ausgelastet", f"Investition gleich, Verluste ≈ {rng('loss_half_load_pct')} statt ≈ {rng('loss_full_load_pct')} %. [D]"],
         ["Mehr, z. B. 3–4 GW", "Bei 525 kV sind die Querschnitte schon nahe am Maximum; schwerere Kabel sind in der Tiefsee "
                                "kritisch. [A] Wege: höhere Spannung (keine Kabeldaten) oder ein zweiter Bipol, ≈ doppelte "
                                "Kabelkosten, also annähernd linear. [A]"],
@@ -359,28 +374,32 @@ with PdfPages(d / "slides.pdf") as pdf:
     # 8 depth profiles
     s = Slide(pdf, 8, "Tiefenprofile")
     s.image("depth_profiles.png", 0.65, 1.2, 12, 5.1)
-    s.text(0.65, 6.45, "Die tiefsten Abschnitte: das Becken zwischen Brasilien und Afrika (4.000–6.000 m) und die Biskaya "
-                      "(≈ 4.900 m). Route B umgeht die Biskaya über die spanische Küste. [D]", 11, 12, INK2)
+    s.text(0.65, 6.45, "Die tiefsten Abschnitte: das Becken zwischen Brasilien und Afrika (bis ≈ 4.600 m) und die Biskaya "
+                      "(≈ 4.900 m). B quert die Biskaya weiter östlich bei ≈ 4.600 m, C bleibt dort auf dem französischen "
+                      "Schelf und nutzt vor Brasilien flachere Rücken. [D]", 11, 12, INK2)
     s.save()
 
     # 10 landing point
-    s = Slide(pdf, 10, "Anlandepunkt in Brasilien: noch offen")
-    s.text(0.65, 1.4, "Kostenminimaler Weg je Anlandepunkt bis in die Deutsche Bucht [D]:", 13, 5.9, INK2)
+    s = Slide(pdf, 10, "Anlandepunkt in Brasilien: Macau/Guamaré (RN)")
+    s.text(0.65, 1.4, "Vergleich: kostenminimaler Weg je Anlandepunkt bis in die Deutsche Bucht [D]:", 13, 5.9, INK2)
     y = s.table(0.65, 2.2, [1.6, 1.15, 1.35, 1.1, 1.0],
                 [["Anlandung", "Länge", "Investition", "max. Tiefe", "> 3.000 m"]] +
                 [[n, f"{de(R[k]['length_km'])} km", f"{de(R[k]['total_bn'],1)} Mrd. €", f"{de(R[k]['max_depth_m'])} m",
                   f"{de(R[k]['km']['abyssal'])} km"] for k, n in land.items()],
                 size=11.5, right=(1, 2, 3, 4))
-    s.text(0.65, y + 0.1, f"Die Bandbreite beträgt ≈ {de(max(tots)-min(tots))} Mrd. € ({de(100*(max(tots)/min(tots)-1))} %). "
-                          "Der Anlandepunkt verändert die Machbarkeit stärker als die Kosten. [D]", 11.5, 6.2, INK2)
-    s.text(7.3, 1.4, "Kriterien für die Auswahl (gemeinsam mit Rolle 2):", 14, 5.5, weight="bold")
+    M, T, Cv = R["cost_Macau"], R["cost_Touros"], R["cost_Caravelas"]
+    s.text(0.65, y + 0.1, f"Macau kostet ≈ {de(M['total_bn']-T['total_bn'],1)} Mrd. € mehr als Touros/Natal (< 1 %). "
+                          f"Die frühere Wahl in Südbahia (Caravelas) wäre ≈ {de(Cv['total_bn']-M['total_bn'])} Mrd. € teurer "
+                          f"und ≈ {de(r5((Cv['length_km']-M['length_km'])/10)*10)} km länger. [D]", 11.5, 6.2, INK2)
+    s.text(7.3, 1.4, "Warum Macau/Guamaré (Rolle 2):", 14, 5.5, weight="bold")
     s.bullets(7.3, 1.95, [
-        "Nähe zu Afrika: Die Ostspitze bei Natal/Touros hat die kürzeste und flachste Tiefseequerung. [D]",
-        "Nähe zur Erzeugung: Wind- und Solarstandorte in CE und RN (Shortlist). [D]",
-        "Hafen & Logistik: Pecém, Natal (Shortlist). [D]",
-        "Netz: Anschluss an das Netz im Nordosten für den Konverter. [A]",
-        "Küste: Schutzgebiete und Schiffsverkehr (Daten liegen vor). [D]",
+        "Nordküste von Rio Grande do Norte, der Teil Brasiliens, der Afrika am nächsten liegt. [D]",
+        "Anlagen im Umkreis von 150 km liefern in jeder Stunde von 2013 mindestens 2 GW: 8,7 GW Photovoltaik, "
+        "3,5 GW Wind an Land, Batterie 3,2 GW / 30 GWh. [D]",
+        "Erzeugung ≈ 76 €/MWh frei Kabel, gerechnet mit europäischen Kosten für 2035. [D]",
+        "Netz: Anschluss des Konverters an das Netz im Nordosten noch prüfen. [A]",
     ], size=13.5, width=5.5, gap=0.15)
+    s.text(7.3, 6.6, "Quelle: workshop/brazil/landing_location.txt (Rolle 2).", 10, 5.5, INK2)
     s.save()
 
     # 12 method
@@ -388,7 +407,9 @@ with PdfPages(d / "slides.pdf") as pdf:
     s.bullets(0.7, 1.45, [
         "Kabeldaten: workshop/inputs/cable_system_design.yaml (Preisbasis 2025, EUR).",
         "Bathymetrie: GEBCO 2025, Atlantik-Korridor 30″; für die Routensuche auf 0,05° gemittelt.",
-        "Routenwahl: kürzester Weg (Dijkstra), Kosten je km nach Tiefenklasse; Variante B mit Tiefengrenze ≈ 4.580 m.",
+        "Anlandung Brasilien: Macau/Guamaré (RN), Rolle 2 (workshop/brazil/landing_location.txt).",
+        "Routenwahl: kürzester Weg (Dijkstra), Kosten je km nach Tiefenklasse; Variante B mit Tiefengrenze ≈ 4.580 m; "
+        "Variante C zählt Strecken über 3.000 m vierfach.",
         "Verluste: Gleichstromwiderstand bei maximaler Temperatur, Nennstrom 1.905 A, Konverter je 0,86 %.",
         "Grenzen: grobes Raster, in Küstennähe ungenau; keine Daten zu Schiffsverkehr, Kabeln und Schutzgebieten "
         "außerhalb Brasiliens; Anlandung in Deutschland pauschal in der Deutschen Bucht; Kapitalkosten noch nicht annualisiert.",

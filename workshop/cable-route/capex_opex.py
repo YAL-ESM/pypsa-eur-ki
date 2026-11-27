@@ -7,16 +7,17 @@ Herkunft: "direkt" = steht so in den Workshop-Daten, "berechnet" = aus den Daten
 import json
 from pathlib import Path
 
-ROUTES = [("cost_Touros", "A · Touros, kostenminimal"), ("shallow", "B · Touros, geringste Tiefe"),
-          ("cost_Pecem", "C · Pecém, kürzeste")]
-FOM = {"cost_Touros": 250, "shallow": 250, "cost_Pecem": 250}      # Mio. EUR/a, rounded
-REPAIR = {"cost_Touros": 12, "shallow": 13, "cost_Pecem": 11}      # Mio. EUR/a, rounded
+# All three routes start at the landing chosen by role 2: Macau/Guamaré (RN), see routes.py.
+ROUTES = [("cost_Macau", "A · kostenminimal"), ("shallow", "B · geringste Maximaltiefe"),
+          ("minabyss", "C · wenigste km > 3.000 m")]
 LIFE = 40
 
 
 def rows(d):
     R = json.loads((Path(d) / "routes.json").read_text())
     r = [R[k] for k, _ in ROUTES]
+    FOM = {k: R[k]["fom_mio"] for k, _ in ROUTES}        # Mio. EUR/a, rounded to 10 in routes.py
+    REPAIR = {k: R[k]["repair_mio"] for k, _ in ROUTES}  # Mio. EUR/a, rounded in routes.py
     opex = [FOM[k] + REPAIR[k] for k, _ in ROUTES]
     # (Posten, Art, Einheit, values, Herkunft, Erläuterung)
     return [
