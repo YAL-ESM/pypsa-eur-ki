@@ -16,4 +16,4 @@ Earlier result (landing_point.py, most output within 250 km, no time series):
   Latitude:   -18.2775
   Longitude:  -39.6499
 
-Hourly time series of the RN landing: results/brazil/firm_supply_timeseries.csv
+Hourly time series of the RN landing: workshop/brazil/timeseries/firm_supply_timeseries.csv

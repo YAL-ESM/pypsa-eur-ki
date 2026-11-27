@@ -27,7 +27,8 @@ NREL 5.5 MW (fixed) / 5 MW (floating) offshore x 0.8855.
     pixi run python workshop/brazil/firm_supply.py
     pixi run python workshop/brazil/firm_supply.py --no-connection   # plants and battery only, files *_noconn.*
 
-Exact positions stay in results/ (git-ignored).
+Exact positions stay in results/ (git-ignored); the hourly series of the best landing (GW only) goes to
+workshop/brazil/timeseries/.
 """
 
 import sys
@@ -50,6 +51,7 @@ st, DATA, OUT, CELL, ROOT = po.st, po.DATA, po.OUT, po.CELL, po.pe.ROOT
 FIRM_GW = 2.0
 RADIUS_KM = 150
 STEP_KM = 25
+TS_DIR = Path(__file__).parent / "timeseries"  # hourly series of the best landing, tracked in git
 CONNECTION = "--no-connection" not in sys.argv  # include the lines from the plants to the landing
 SUFFIX = "" if CONNECTION else "_noconn"
 WORKERS = 4  # each LP needs about 1 GB; the workspace limit is 10 GB
@@ -286,8 +288,11 @@ def main():
                        "into_cable_GW": np.minimum(plant - sto["charge"] + sto["discharge"], FIRM_GW),
                        "surplus_GW": np.maximum(plant - sto["charge"] + sto["discharge"] - FIRM_GW, 0)}, index=time)
     ts.index.name = "time"
-    ts.round(4).to_csv(OUT / f"firm_supply_timeseries{SUFFIX}.csv")
-    print(f"saved {OUT / f'firm_supply_timeseries{SUFFIX}.csv'}:\n", ts.describe().loc[["mean", "min", "max"]].round(2).to_string())
+    # tracked in git (GW per hour only, no positions): workshop/brazil/timeseries/
+    ts_file = TS_DIR / f"firm_supply_timeseries{SUFFIX}.csv"
+    TS_DIR.mkdir(parents=True, exist_ok=True)
+    ts.round(4).to_csv(ts_file)
+    print(f"saved {ts_file}:\n", ts.describe().loc[["mean", "min", "max"]].round(2).to_string())
     by_t.to_csv(OUT / f"firm_supply_hourly{SUFFIX}.csv")
     tot = by_t[TECHS].sum(axis=1)
     into = np.minimum(tot + by_t.battery, FIRM_GW * 10)
