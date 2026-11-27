@@ -38,18 +38,89 @@ slides.append(f"""
   Basis: 2 GW Bipol, 525 kV · Preisbasis 2025 · Anlandepunkt in Brasilien noch offen</p>
 </section>""")
 
+ABC = (A, B, C)
+yrs = lambda r: de(r["lay_days"] / 365, 1)
+
+# 1 key messages, conclusions and levers
 slides.append(f"""
 <section>
-  <h2>Kernaussagen</h2>
-  <ol class="big">
-    <li><b>Technisch nicht erprobt:</b> Kein Seeweg bleibt unter 3.000 m.
-        Das bestmögliche Maximum liegt bei <b>≈ 4.430 m</b>, verlegt wurde bisher bis 2.150 m. [D]</li>
-    <li><b>Zu teuer:</b> <b>{de(min(tots),1)}–{de(max(tots),1)} Mrd. €</b> je nach Anlandepunkt,
-        das ist das <b>{de(min(tots)/budget,1)}–{de(max(tots)/budget,1)}-Fache</b> der Budgetgrenze von {de(budget,1)} Mrd. €. [D]</li>
-    <li><b>Hohe Verluste:</b> Bei Volllast kommt nur etwa <b>⅔</b> der Leistung an (≈ 35 % Verlust). [D]</li>
-    <li><b>Die Route ist nicht der Hebel:</b> Die Varianten unterscheiden sich um wenige Prozent. [D]
-        Entscheidend sind Spannung, Leistung und Tiefenqualifikation. [A]</li>
+  <h2>Kernaussagen, Folgerungen und Hebel</h2>
+  <div class="cols">
+  <div>
+  <h3>Kernaussagen</h3>
+  <ol>
+    <li><b>Technisch nicht erprobt:</b> Jede Route ist tiefer als 3.000 m, selbst die flachste bis
+        ≈ {de(B['max_depth_m'])} m. Verlegt wurde bisher bis 2.150 m. [D]</li>
+    <li><b>Zu teuer:</b> {de(min(tots),1)}–{de(max(tots),1)} Mrd. €, das
+        <b>{de(min(tots)/budget,1)}–{de(max(tots)/budget,1)}-Fache</b> des Budgets von {de(budget,1)} Mrd. €. [D]</li>
+    <li><b>Hohe Verluste:</b> Bei Volllast kommt nur ≈ ⅔ der Leistung an. [D]</li>
+    <li><b>Lange Bauzeit:</b> mit einem Verlegeschiff gut 6 Jahre. [D]</li>
   </ol>
+  </div>
+  <div>
+  <h3>Folgerungen und Hebel</h3>
+  <ul>
+    <li>Die <b>Route ist kaum ein Hebel</b>: Die Varianten unterscheiden sich um ≈ 2 % in den Kosten. [D]</li>
+    <li><b>Voraussetzung</b> für jede Variante: ein Kabel, das für ≈ 4.500 m qualifiziert ist. [D]</li>
+    <li><b>Verluste senken</b>: höhere Spannung oder größerer Querschnitt [A], Teillastbetrieb [D].</li>
+    <li><b>Budget</b> nur erreichbar, wenn die Kosten pro km um mehr als die Hälfte sinken. [D]</li>
+    <li><b>Bauzeit</b>: mehrere Schiffe parallel, Bau in Abschnitten. [A]</li>
+  </ul>
+  </div>
+  </div>
+</section>""")
+
+# 2 biggest risks
+RISKS = [
+    ["Tiefe über 3.000 m", "Für 3.000–6.000 m gibt es nur eine Designstudie; jede Route reicht tiefer. [D]",
+     "Qualifizierung für ≈ 4.500 m (Zuschuss in Aussicht); flachste Route B. [D]"],
+    ["Kosten und Finanzierung", f"{de(min(tots),1)}–{de(max(tots),1)} Mrd. € gegenüber {de(budget,1)} Mrd. € Budget. [D]",
+     "Staatliche Kreditgarantie und Zuschüsse [D]; geringere Leistung oder Bau in Stufen. [A]"],
+    ["Verluste", "≈ 35 % bei Volllast, ≈ 18 % bei halber Last. [D]",
+     "Höhere Spannung oder größerer Querschnitt [A]; Teillastbetrieb. [D]"],
+    ["Bauzeit und Verzug", "Gut 6 Jahre mit einem Schiff; bei mehr als 30 Monaten Verzug kann der Abnehmer aussteigen. [D] "
+     "Schiffe und Fertigung sind knapp. [A]",
+     "Mehrere Schiffe, Bau in Abschnitten, Kapazitäten früh sichern. [A]"],
+    ["Schäden und Reparaturen", "≈ 55 Tage/Jahr mit halber Leistung. [D] Anker und Fischerei im Flachwasser, "
+     "Hangrutschungen, Sabotage; im Bündel fallen beide Pole zugleich aus. [A]",
+     "Reparaturvertrag mit reserviertem Schiff, Ersatzteile auf Lager; Pole im Flachen getrennt verlegen; Überwachung. [A]"],
+    ["Genehmigung in ≈ 10 Staaten", "Eigenes Recht und Umweltprüfung je Staat; Transitstaaten haben keinen Nutzen; "
+     "umstrittene Gewässer. [A]",
+     "Staatsvertrag DE–BR mit Transitstaaten; Netzabzweig als Nutzen; EU-Förderstatus (PCI/PMI). [A]"],
+]
+trs = "".join(f"<tr><td><b>{a}</b></td><td>{b}</td><td>{c}</td></tr>" for a, b, c in RISKS)
+slides.append(f"""
+<section class="dense">
+  <h2>Die größten Risiken</h2>
+  <table class="mid"><tr><th style="width:20%">Risiko</th><th style="width:42%">Was droht</th><th>Gegenmaßnahme</th></tr>{trs}</table>
+  <p class="note">Ausführlich: Folien „Wichtigste Faktoren“ im hinteren Teil.</p>
+</section>""")
+
+# 3 proposed routes with assessment
+cell = lambda f: "".join(f"<td>{f(r)}</td>" for r in ABC)
+slides.append(f"""
+<section class="fig">
+  <h2>Vorgeschlagene Routen und Bewertung</h2>
+  <div class="cols wide">
+    {img("map_routes.png")}
+    <div>
+    <table class="rt">
+      <tr><th>[D]</th><th>A · Touros<br>kostenminimal</th><th>B · Touros<br>geringste Tiefe</th><th>C · Pecém<br>kürzeste</th></tr>
+      <tr><td>Länge</td>{cell(lambda r: de(r['length_km']) + ' km')}</tr>
+      <tr><td>Investition</td>{cell(lambda r: de(r['total_bn'],1) + ' Mrd. €')}</tr>
+      <tr><td>Max. Tiefe</td>{cell(lambda r: de(r['max_depth_m']) + ' m')}</tr>
+      <tr><td>&gt; 3.000 m</td>{cell(lambda r: de(r['km']['abyssal']) + ' km')}</tr>
+      <tr><td>Verlust Volllast</td>{cell(lambda r: de(r['loss_full_load_pct']) + ' %')}</tr>
+      <tr><td>Bauzeit, 1 Schiff</td>{cell(lambda r: yrs(r) + ' Jahre')}</tr>
+      <tr class="pro"><td>+</td><td>am günstigsten</td><td>am flachsten, kürzeste Strecke &gt; 3.000 m</td><td>am kürzesten, geringste Verluste</td></tr>
+      <tr class="con"><td>−</td><td>quert die Biskaya mit fast 4.900 m</td><td>am längsten, mehr Flachwasser mit Schiffsverkehr [A]</td><td>am tiefsten, fast 3.000 km &gt; 3.000 m</td></tr>
+      <tr class="hl"><td><b>Bewertung</b></td><td>Rückfalloption, wenn die Biskaya qualifiziert wird</td>
+        <td><b>Vorschlag:</b> technisch am wenigsten extrem, ≈ 2 % teurer</td><td>nur bei Anlandung in Pecém; höchstes Tiefenrisiko</td></tr>
+    </table>
+    <p class="note">Kostengünstigste Wege auf einem 0,05°-Raster. Alle Varianten liegen über dem Doppelten des Budgets.
+       Die Anlandepunkte in Brasilien sind Beispiele, die Auswahl ist noch offen. [D]</p>
+    </div>
+  </div>
 </section>""")
 
 for ps in P["slides"]:
@@ -125,19 +196,6 @@ slides.append("""
   </ul>
 </section>""")
 
-slides.append(f"""
-<section class="fig">
-  <h2>Drei Beispielrouten</h2>
-  <div class="cols wide">
-    {img("map_routes.png")}
-    <div class="side">
-      <p>Berechnet als kostengünstigster Weg über ein Raster mit 0,05° Auflösung, gewichtet mit den Kosten pro km der Tiefenklasse. [D]</p>
-      <p>Alle Routen führen an Westafrika und Portugal entlang und durch den Ärmelkanal. Der afrikanische
-         Kontinentalhang ist der günstigste Abschnitt. [D]</p>
-      <p class="warn">Die brasilianischen Anlandepunkte sind <b>Beispiele</b>, die Auswahl ist noch offen.</p>
-    </div>
-  </div>
-</section>""")
 
 slides.append(f"""
 <section class="fig">
@@ -147,24 +205,6 @@ slides.append(f"""
   Route B umgeht die Biskaya über die spanische Küste. [D]</p>
 </section>""")
 
-slides.append(f"""
-<section>
-  <h2>Routenvergleich</h2>
-  <table>
-    <tr><th>[D] berechnet</th><th>A · Touros, kostenminimal</th><th>B · Touros, geringste Tiefe</th><th>C · Pecém, kürzeste</th></tr>
-    <tr><td>Länge</td><td>{de(A['length_km'])} km</td><td>{de(B['length_km'])} km</td><td>{de(C['length_km'])} km</td></tr>
-    <tr><td>Investition</td><td><b>{de(A['total_bn'],1)} Mrd. €</b></td><td>{de(B['total_bn'],1)} Mrd. €</td><td>{de(C['total_bn'],1)} Mrd. €</td></tr>
-    <tr><td>Maximale Tiefe</td><td>{de(A['max_depth_m'])} m</td><td><b>{de(B['max_depth_m'])} m</b></td><td>{de(C['max_depth_m'])} m</td></tr>
-    <tr><td>Strecke tiefer als 3.000 m</td><td>{de(A['km']['abyssal'])} km</td><td><b>{de(B['km']['abyssal'])} km</b></td><td>{de(C['km']['abyssal'])} km</td></tr>
-    <tr><td>Verlust Voll- / Halblast</td><td>{de(A['loss_full_load_pct'])} / {de(A['loss_half_load_pct'])} %</td>
-        <td>{de(B['loss_full_load_pct'])} / {de(B['loss_half_load_pct'])} %</td><td><b>{de(C['loss_full_load_pct'])} / {de(C['loss_half_load_pct'])} %</b></td></tr>
-    <tr class="pro"><td>+</td><td>am günstigsten, kürzeste Tiefseequerung nach Afrika</td>
-        <td>umgeht die Biskaya, technisch am wenigsten extrem</td><td>am kürzesten, geringste Verluste</td></tr>
-    <tr class="con"><td>−</td><td>quert die Biskaya mit fast 4.900 m</td>
-        <td>am längsten [D], mehr Schelfstrecke mit Schiffsverkehr und Fischerei [A]</td><td>am tiefsten (5.900 m), fast 3.000 km auf freier Tiefsee</td></tr>
-  </table>
-  <p class="note">Die Unterschiede in den Kosten liegen bei ≈ 2 %. Alle Varianten liegen über dem Doppelten der Budgetgrenze von {de(budget,1)} Mrd. €. [D]</p>
-</section>""")
 
 rows = "".join(
     f"<tr><td>{n}</td><td class='r'>{de(R[k]['length_km'])} km</td><td class='r'>{de(R[k]['total_bn'],1)} Mrd. €</td>"
@@ -196,21 +236,6 @@ slides.append(f"""
   </div>
 </section>""")
 
-slides.append(f"""
-<section>
-  <h2>Folgerungen und Hebel</h2>
-  <ul class="big">
-    <li>Die <b>Route</b> ist weitgehend festgelegt (Westafrika → Iberien → Ärmelkanal); dort ist kaum etwas zu holen. [D]</li>
-    <li><b>Machbarkeit</b> erfordert ein Kabel, das für ≈ 4.500 m qualifiziert ist. Das ist die Voraussetzung für jede Variante. [D]</li>
-    <li><b>Wirtschaftlichkeit</b>: Die Verluste von ≈ ⅓ wiegen schwerer als die Wahl der Route. [D] Mögliche Hebel:
-      <ul>
-        <li>höhere Spannung oder größerer Querschnitt (Annahme, keine Daten) [A]</li>
-        <li>geringere Leistung bzw. Teillastbetrieb [D]</li>
-        <li>Teilstrecke über Land durch Afrika und Europa (nicht untersucht) [A]</li>
-      </ul></li>
-    <li>Um die Budgetgrenze zu erreichen, müssten die Kosten pro km <b>um mehr als die Hälfte sinken</b>. [D]</li>
-  </ul>
-</section>""")
 
 slides.append("""
 <section>
@@ -255,6 +280,9 @@ tr.pro td,tr.con td{font-size:14px;color:var(--ink2)}tr.pro td:first-child,tr.co
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:40px}.cols.wide{grid-template-columns:auto 1fr;gap:28px}
 .fig img{max-height:490px;max-width:100%;display:block;margin:0 auto}.cols.wide img{max-height:560px;margin:0}
 .side{font-size:16px;line-height:1.5;color:var(--ink2)}
+h3{font-size:20px;margin:0 0 4px;color:var(--acc)}
+.dense table.mid{font-size:15px}.dense table.mid td{padding:9px 10px}
+table.rt{font-size:13px}table.rt td,table.rt th{padding:5px 7px}table.rt tr.pro td,table.rt tr.con td{font-size:12.5px}
 .dense h2{font-size:24px;margin-bottom:12px}.dense table{font-size:12px}.dense td{padding:4px 8px}.dense .note{font-size:11px;margin-top:8px}
 .tag{display:inline-block;font-size:.72em;font-weight:700;line-height:1;padding:2px 4px;border-radius:3px;vertical-align:1px;margin:0 1px}
 .tag.d{background:#e3eefb;color:#1d5aa6}.tag.a{background:#fbe9dc;color:#9a4a0e}

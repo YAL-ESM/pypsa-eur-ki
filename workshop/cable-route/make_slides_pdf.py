@@ -31,7 +31,7 @@ tots = [R[k]["total_bn"] for k in land]
 A, B, C = R["cost_Touros"], R["shallow"], R["cost_Pecem"]
 budget = 31.4
 P = json.loads((d / "problems.json").read_text())
-N_SLIDES = 14 + len(P["slides"])
+N_SLIDES = 13 + len(P["slides"])
 LEGEND = ("[D] = aus den Workshop-Daten oder daraus berechnet   ·   "
           "[A] = allgemeines Fachwissen, nicht durch die Daten im Repo belegt")
 
@@ -123,17 +123,70 @@ with PdfPages(d / "slides.pdf") as pdf:
                      "Basis: 2 GW Bipol, 525 kV · Preisbasis 2025 · Anlandepunkt in Brasilien noch offen", 13, color=INK2)
     s.save()
 
-    # 2 key messages
-    s = Slide(pdf, 2, "Kernaussagen")
-    s.bullets(0.7, 1.6, [
-        "Technisch nicht erprobt: Kein Seeweg bleibt unter 3.000 m. Das bestmögliche Maximum liegt bei ≈ 4.430 m, "
-        "verlegt wurde bisher bis 2.150 m. [D]",
-        f"Zu teuer: {de(min(tots),1)}–{de(max(tots),1)} Mrd. € je nach Anlandepunkt, das ist das "
-        f"{de(min(tots)/budget,1)}–{de(max(tots)/budget,1)}-Fache der Budgetgrenze von {de(budget,1)} Mrd. €. [D]",
-        "Hohe Verluste: Bei Volllast kommt nur etwa ⅔ der Leistung an (≈ 35 % Verlust). [D]",
-        "Die Route ist nicht der Hebel: Die Varianten unterscheiden sich um wenige Prozent. [D] "
-        "Entscheidend sind Spannung, Leistung und Tiefenqualifikation. [A]",
-    ], size=18, width=11.8, gap=0.3, num=True)
+    # 1 key messages, conclusions and levers
+    s = Slide(pdf, 2, "Kernaussagen, Folgerungen und Hebel")
+    s.text(0.7, 1.35, "Kernaussagen", 17, color=ACC, weight="bold")
+    s.bullets(0.7, 1.9, [
+        f"Technisch nicht erprobt: Jede Route ist tiefer als 3.000 m, selbst die flachste bis ≈ {de(B['max_depth_m'])} m. "
+        "Verlegt wurde bisher bis 2.150 m. [D]",
+        f"Zu teuer: {de(min(tots),1)}–{de(max(tots),1)} Mrd. €, das {de(min(tots)/budget,1)}–{de(max(tots)/budget,1)}-Fache "
+        f"des Budgets von {de(budget,1)} Mrd. €. [D]",
+        "Hohe Verluste: Bei Volllast kommt nur ≈ ⅔ der Leistung an. [D]",
+        "Lange Bauzeit: mit einem Verlegeschiff gut 6 Jahre. [D]",
+    ], size=14.5, width=5.8, gap=0.25, num=True)
+    s.text(7.0, 1.35, "Folgerungen und Hebel", 17, color=ACC, weight="bold")
+    s.bullets(7.0, 1.9, [
+        "Die Route ist kaum ein Hebel: Die Varianten unterscheiden sich um ≈ 2 % in den Kosten. [D]",
+        "Voraussetzung für jede Variante: ein Kabel, das für ≈ 4.500 m qualifiziert ist. [D]",
+        "Verluste senken: höhere Spannung oder größerer Querschnitt [A], Teillastbetrieb [D].",
+        "Budget nur erreichbar, wenn die Kosten pro km um mehr als die Hälfte sinken. [D]",
+        "Bauzeit: mehrere Schiffe parallel, Bau in Abschnitten. [A]",
+    ], size=14.5, width=5.8, gap=0.25)
+    s.save()
+
+    # 2 biggest risks
+    s = Slide(pdf, 3, "Die größten Risiken")
+    RISKS = [
+        ["Tiefe über 3.000 m", "Für 3.000–6.000 m gibt es nur eine Designstudie; jede Route reicht tiefer. [D]",
+         "Qualifizierung für ≈ 4.500 m (Zuschuss in Aussicht); flachste Route B. [D]"],
+        ["Kosten und Finanzierung", f"{de(min(tots),1)}–{de(max(tots),1)} Mrd. € gegenüber {de(budget,1)} Mrd. € Budget. [D]",
+         "Staatliche Kreditgarantie und Zuschüsse [D]; geringere Leistung oder Bau in Stufen. [A]"],
+        ["Verluste", "≈ 35 % bei Volllast, ≈ 18 % bei halber Last. [D]",
+         "Höhere Spannung oder größerer Querschnitt [A]; Teillastbetrieb. [D]"],
+        ["Bauzeit und Verzug", "Gut 6 Jahre mit einem Schiff; bei mehr als 30 Monaten Verzug kann der Abnehmer aussteigen. [D] "
+         "Schiffe und Fertigung sind knapp. [A]",
+         "Mehrere Schiffe, Bau in Abschnitten, Kapazitäten früh sichern. [A]"],
+        ["Schäden und Reparaturen", "≈ 55 Tage/Jahr mit halber Leistung. [D] Anker und Fischerei im Flachwasser, "
+         "Hangrutschungen, Sabotage; im Bündel fallen beide Pole zugleich aus. [A]",
+         "Reparaturvertrag mit reserviertem Schiff, Ersatzteile auf Lager; Pole im Flachen getrennt verlegen; Überwachung. [A]"],
+        ["Genehmigung in ≈ 10 Staaten", "Eigenes Recht und Umweltprüfung je Staat; Transitstaaten haben keinen Nutzen; "
+         "umstrittene Gewässer. [A]",
+         "Staatsvertrag DE–BR mit Transitstaaten; Netzabzweig als Nutzen; EU-Förderstatus (PCI/PMI). [A]"],
+    ]
+    y = s.table(0.65, 1.3, [2.5, 5.1, 4.5], [["Risiko", "Was droht", "Gegenmaßnahme"]] + RISKS,
+                size=12, bold_cells={(i, 0) for i in range(1, len(RISKS) + 1)})
+    s.text(0.65, y + 0.05, "Ausführlich: Folien „Wichtigste Faktoren“ im hinteren Teil.", 11, 12, INK2)
+    s.save()
+
+    # 3 proposed routes with assessment
+    s = Slide(pdf, 4, "Vorgeschlagene Routen und Bewertung")
+    s.image("map_routes.png", 0.4, 1.15, 5.2, 5.8)
+    ABC = (A, B, C)
+    y = s.table(5.75, 1.2, [1.45, 1.95, 1.95, 1.85], [
+        ["[D]", "A · Touros, kostenminimal", "B · Touros, geringste Tiefe", "C · Pecém, kürzeste"],
+        ["Länge", *[f"{de(r['length_km'])} km" for r in ABC]],
+        ["Investition", *[f"{de(r['total_bn'],1)} Mrd. €" for r in ABC]],
+        ["Max. Tiefe", *[f"{de(r['max_depth_m'])} m" for r in ABC]],
+        ["> 3.000 m", *[f"{de(r['km']['abyssal'])} km" for r in ABC]],
+        ["Verlust Volllast", *[f"{de(r['loss_full_load_pct'])} %" for r in ABC]],
+        ["Bauzeit, 1 Schiff", *[f"{de(r['lay_days']/365,1)} Jahre" for r in ABC]],
+        ["+", "am günstigsten", "am flachsten, kürzeste Strecke > 3.000 m", "am kürzesten, geringste Verluste"],
+        ["−", "quert die Biskaya mit fast 4.900 m", "am längsten, mehr Flachwasser mit Schiffsverkehr [A]",
+         "am tiefsten, fast 3.000 km > 3.000 m"],
+        ["Bewertung", "Rückfalloption, wenn die Biskaya qualifiziert wird", "Vorschlag: technisch am wenigsten extrem, ≈ 2 % teurer",
+         "nur bei Anlandung in Pecém; höchstes Tiefenrisiko"],
+    ], size=10, hl_rows=(9,), bold_cells={(7, 0), (8, 0), (9, 0), (9, 2)})
+    s.text(5.75, y, "Alle Varianten über dem Doppelten des Budgets; Anlandepunkte sind Beispiele. [D]", 10, 7.4, INK2)
     s.save()
 
     # implementation factors (problems.json)
@@ -201,40 +254,11 @@ with PdfPages(d / "slides.pdf") as pdf:
     s.text(1.05, y - 0.1, "Dafür gibt es keine Kabeldaten, das ist eine Annahme.", 15, 11, WARN)
     s.save()
 
-    # 7 route map
-    s = Slide(pdf, 7, "Drei Beispielrouten")
-    s.image("map_routes.png", 0.5, 1.2, 6.2, 5.75)
-    y = s.text(7.0, 1.6, "Berechnet als kostengünstigster Weg über ein Raster mit 0,05° Auflösung, gewichtet mit den "
-                         "Kosten pro km der Tiefenklasse. [D]", 14, 5.8, INK2)
-    y = s.text(7.0, y + 0.3, "Alle Routen führen an Westafrika und Portugal entlang und durch den Ärmelkanal. "
-                             "Der afrikanische Kontinentalhang ist der günstigste Abschnitt. [D]", 14, 5.8, INK2)
-    s.text(7.0, y + 0.3, "Die brasilianischen Anlandepunkte sind Beispiele, die Auswahl ist noch offen.", 14, 5.8, WARN, "bold")
-    s.save()
-
     # 8 depth profiles
     s = Slide(pdf, 8, "Tiefenprofile")
     s.image("depth_profiles.png", 0.65, 1.2, 12, 5.1)
     s.text(0.65, 6.45, "Die tiefsten Abschnitte: das Becken zwischen Brasilien und Afrika (4.000–6.000 m) und die Biskaya "
                       "(≈ 4.900 m). Route B umgeht die Biskaya über die spanische Küste. [D]", 11, 12, INK2)
-    s.save()
-
-    # 9 comparison
-    s = Slide(pdf, 9, "Routenvergleich")
-    f = lambda r, k: de(r[k])
-    y = s.table(0.65, 1.35, [2.7, 3.1, 3.1, 3.1], [
-        ["[D] berechnet", "A · Touros, kostenminimal", "B · Touros, geringste Tiefe", "C · Pecém, kürzeste"],
-        ["Länge", f"{f(A,'length_km')} km", f"{f(B,'length_km')} km", f"{f(C,'length_km')} km"],
-        ["Investition", f"{de(A['total_bn'],1)} Mrd. €", f"{de(B['total_bn'],1)} Mrd. €", f"{de(C['total_bn'],1)} Mrd. €"],
-        ["Maximale Tiefe", f"{f(A,'max_depth_m')} m", f"{f(B,'max_depth_m')} m", f"{f(C,'max_depth_m')} m"],
-        ["Strecke tiefer als 3.000 m", f"{de(A['km']['abyssal'])} km", f"{de(B['km']['abyssal'])} km", f"{de(C['km']['abyssal'])} km"],
-        ["Verlust Voll- / Halblast", *[f"{de(r['loss_full_load_pct'])} / {de(r['loss_half_load_pct'])} %" for r in (A, B, C)]],
-        ["+ Vorteile", "am günstigsten, kürzeste Tiefseequerung nach Afrika", "umgeht die Biskaya, technisch am wenigsten extrem",
-         "am kürzesten, geringste Verluste"],
-        ["− Nachteile", "quert die Biskaya mit fast 4.900 m", "am längsten [D], mehr Schelfstrecke mit Schiffsverkehr und Fischerei [A]",
-         "am tiefsten (5.900 m), fast 3.000 km auf freier Tiefsee"],
-    ], size=12.5, bold_cells={(2, 1), (3, 2), (4, 2), (5, 3), (6, 0), (7, 0)})
-    s.text(0.65, y + 0.1, f"Die Unterschiede in den Kosten liegen bei ≈ 2 %. Alle Varianten liegen über dem Doppelten der "
-                          f"Budgetgrenze von {de(budget,1)} Mrd. €. [D]", 12, 12, INK2)
     s.save()
 
     # 10 landing point
@@ -255,19 +279,6 @@ with PdfPages(d / "slides.pdf") as pdf:
         "Netz: Anschluss an das Netz im Nordosten für den Konverter. [A]",
         "Küste: Schutzgebiete und Schiffsverkehr (Daten liegen vor). [D]",
     ], size=13.5, width=5.5, gap=0.15)
-    s.save()
-
-    # 11 conclusions
-    s = Slide(pdf, 11, "Folgerungen und Hebel")
-    s.bullets(0.7, 1.5, [
-        "Die Route ist weitgehend festgelegt (Westafrika → Iberien → Ärmelkanal); dort ist kaum etwas zu holen. [D]",
-        "Machbarkeit erfordert ein Kabel, das für ≈ 4.500 m qualifiziert ist. Das ist die Voraussetzung für jede Variante. [D]",
-        "Wirtschaftlichkeit: Die Verluste von ≈ ⅓ wiegen schwerer als die Wahl der Route. [D] Mögliche Hebel:",
-        ["höhere Spannung oder größerer Querschnitt (Annahme, keine Daten) [A]",
-         "geringere Leistung bzw. Teillastbetrieb [D]",
-         "Teilstrecke über Land durch Afrika und Europa (nicht untersucht) [A]"],
-        "Um die Budgetgrenze zu erreichen, müssten die Kosten pro km um mehr als die Hälfte sinken. [D]",
-    ], size=17, width=11.8, gap=0.25)
     s.save()
 
     # 12 method
