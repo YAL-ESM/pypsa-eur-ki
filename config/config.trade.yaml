@@ -53,3 +53,7 @@ solving:
       enable: true          # (DK2 without Sweden: 0.3 GW, ~1 GWh in the year) do not
       default_cost: 10000   # make the whole year infeasible. EUR/MWh; ACER (2018) puts
                             # the value of lost load in the EU at several 1000 EUR/MWh.
+  solver_options:
+    copt-default:
+      Threads: 2            # 2045 with 4 threads was killed at 7.5 GB; fewer barrier
+                            # threads hold fewer copies of the factorisation in memory
