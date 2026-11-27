@@ -17,7 +17,7 @@ from pathlib import Path
 
 import yaml
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]  # workshop/cable-route/skripte/ -> repo
 YAML = REPO / "workshop" / "inputs" / "cable_system_design.yaml"
 cfg = yaml.safe_load(YAML.read_text())
 ref = re.search(r"Reference\s+(\S+)", YAML.read_text()).group(1)

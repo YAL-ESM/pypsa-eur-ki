@@ -11,7 +11,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 
 d = Path(sys.argv[1])
-R = json.loads((d / "routes.json").read_text())
+R = json.loads((d / "skripte" / "routes.json").read_text())
 KEYS = [("cost_Macau", "A · kostenminimal"), ("shallow", "B · geringste Maximaltiefe"),
         ("minabyss", "C · wenigste km tiefer als 3.000 m")]
 A, B, C = (R[k] for k, _ in KEYS)
@@ -83,7 +83,7 @@ notes = [
     f"{de(SHORT['km']['abyssal'])} km tiefer als 3.000 m, max. {de(SHORT['max_depth_m'])} m).",
     "Anlandung Brasilien: workshop/brazil/landing_location.txt (Rolle 2). Routen: kostengünstigster Weg auf einem "
     "0,05°-Raster (GEBCO 2025); B mit Tiefengrenze ≈ 4.580 m, C zählt Strecken über 3.000 m vierfach.",
-    "Quelle der Kennzahlen: workshop/cable-route/routes.json, erzeugt von routes.py mit den Kabeldaten. "
+    "Quelle der Kennzahlen: workshop/cable-route/skripte/routes.json, erzeugt von routes.py mit den Kabeldaten. "
     "Bisher sind Kabel bis 2.150 m verlegt und bis 3.000 m typgeprüft; jede Route reicht tiefer.",
     "Verluste nicht in € bewertet: Im PyPSA-Modell stecken sie im Wirkungsgrad der Verbindung.",
 ]
@@ -95,6 +95,6 @@ for row in ws.iter_rows(min_row=4, max_row=last):
     for c in row:
         c.alignment = Alignment(vertical="top", wrap_text=True)
 ws.freeze_panes = "B5"
-out = d / "routen_vergleich.xlsx"
+out = d / "excel" / "routen_vergleich.xlsx"
 wb.save(out)
 print(f"-> {out}")

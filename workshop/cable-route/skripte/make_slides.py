@@ -9,14 +9,14 @@ import sys
 from pathlib import Path
 
 d = Path(sys.argv[1])
-sys.path.insert(0, str(d))
+sys.path.insert(0, str(d / "skripte"))
 import capex_opex as CO  # noqa: E402
-R = json.loads((d / "routes.json").read_text())
-P = json.loads((d / "problems.json").read_text())
+R = json.loads((d / "skripte" / "routes.json").read_text())
+P = json.loads((d / "skripte" / "problems.json").read_text())
 
 
 def img(name):
-    b = base64.b64encode((d / name).read_bytes()).decode()
+    b = base64.b64encode((d / "folien" / name).read_bytes()).decode()
     return f'<img src="data:image/png;base64,{b}" alt="{name}">'
 
 
@@ -399,7 +399,7 @@ slides.append("""
     <li><b>Grenzen</b>: grobes Raster, in Küstennähe ungenau; keine Daten zu Schiffsverkehr, Kabeln und Schutzgebieten
         außerhalb Brasiliens; Anlandung in Deutschland pauschal in der Deutschen Bucht; Kapitalkosten noch nicht annualisiert.</li>
     <li><b>Kennzeichnung</b>: [D] steht für Zahlen und Aussagen aus den Dateien oben oder daraus berechnet; [A] für allgemeines Fachwissen ohne Beleg im Repo, vor Verwendung prüfen.</li>
-    <li>Skripte: workshop/cable-route/ (grid.py, routes.py, plot_maps.py, make_slides.py, make_slides_pdf.py, problems.json).</li>
+    <li>Skripte: workshop/cable-route/skripte/, Folien: folien/, Excel: excel/.</li>
   </ul>
 </section>""")
 
@@ -452,5 +452,5 @@ document.addEventListener('click',e=>show(e.clientX>innerWidth/2?i+1:i-1));show(
 html = f"""<!doctype html><html lang="de"><head><meta charset="utf-8"><title>HVDC-Kabel Brasilien–Deutschland</title>
 <style>{css}</style></head><body>{''.join(slides)}<script>{js}</script></body></html>"""
 html = html.replace("[D]", '<span class="tag d">D</span>').replace("[A]", '<span class="tag a">A</span>')
-(d / "slides.html").write_text(html, encoding="utf-8")
-print(f"{len(slides)} slides -> {d/'slides.html'}")
+(d / "folien" / "slides.html").write_text(html, encoding="utf-8")
+print(f"{len(slides)} slides -> {d / 'folien' / 'slides.html'}")

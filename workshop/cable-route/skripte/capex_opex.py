@@ -14,7 +14,7 @@ LIFE = 40
 
 
 def rows(d):
-    R = json.loads((Path(d) / "routes.json").read_text())
+    R = json.loads((Path(d) / "skripte" / "routes.json").read_text())
     r = [R[k] for k, _ in ROUTES]
     FOM = {k: R[k]["fom_mio"] for k, _ in ROUTES}        # Mio. EUR/a, rounded to 10 in routes.py
     REPAIR = {k: R[k]["repair_mio"] for k, _ in ROUTES}  # Mio. EUR/a, rounded in routes.py

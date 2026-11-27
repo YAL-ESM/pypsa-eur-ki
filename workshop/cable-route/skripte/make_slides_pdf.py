@@ -16,9 +16,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 d = Path(sys.argv[1])
-sys.path.insert(0, str(d))
+sys.path.insert(0, str(d / "skripte"))
 import capex_opex as CO  # noqa: E402
-R = json.loads((d / "routes.json").read_text())
+R = json.loads((d / "skripte" / "routes.json").read_text())
 INK, INK2, MUTED, LINE, ACC, WARN, HL = "#0b0b0b", "#52514e", "#8a8880", "#e6e5e0", "#2a78d6", "#b5560f", "#eef4fc"
 W, H = 13.333, 7.5
 plt.rcParams.update({"font.family": "DejaVu Sans", "pdf.fonttype": 42})
@@ -40,7 +40,7 @@ tots = [r["total_bn"] for r in ABC]
 rng = lambda key, nd=0: f"{de(min(r[key] for r in ABC), nd)}–{de(max(r[key] for r in ABC), nd)}"
 dpct = lambda r: de(100 * (r["total_bn"] / A["total_bn"] - 1))  # cost difference to A in %
 r5 = lambda x: int(5 * round(x / 5))
-P = json.loads((d / "problems.json").read_text())
+P = json.loads((d / "skripte" / "problems.json").read_text())
 N_SLIDES = 17 + len(P["slides"])
 LEGEND = ("[D] = aus den Workshop-Daten oder daraus berechnet   ·   "
           "[A] = allgemeines Fachwissen, nicht durch die Daten im Repo belegt")
@@ -109,7 +109,7 @@ class Slide:
         return y + 0.1
 
     def image(self, name, x, y, w, h):
-        im = mpimg.imread(d / name)
+        im = mpimg.imread(d / "folien" / name)
         ih, iw = im.shape[:2]
         s = min(w / iw, h / ih); pw, ph = iw * s, ih * s
         x0 = x + (w - pw) / 2
@@ -123,7 +123,7 @@ class Slide:
         plt.close(self.fig)
 
 
-with PdfPages(d / "slides.pdf") as pdf:
+with PdfPages(d / "folien" / "slides.pdf") as pdf:
     # 1 title
     s = Slide(pdf, 1)
     s.ax.add_patch(plt.Rectangle((0, 0), 0.15, H, color=ACC, lw=0))
@@ -415,7 +415,7 @@ with PdfPages(d / "slides.pdf") as pdf:
         "außerhalb Brasiliens; Anlandung in Deutschland pauschal in der Deutschen Bucht; Kapitalkosten noch nicht annualisiert.",
         "Kennzeichnung: [D] steht für Zahlen und Aussagen aus den Dateien oben oder daraus berechnet; [A] für allgemeines "
         "Fachwissen ohne Beleg im Repo, vor Verwendung prüfen.",
-        "Skripte: workshop/cable-route/ (grid.py, routes.py, plot_maps.py, make_slides.py, make_slides_pdf.py, problems.json).",
+        "Skripte: workshop/cable-route/skripte/, Folien: folien/, Excel: excel/.",
     ], size=14, width=11.8, gap=0.18)
     s.save()
 
@@ -426,4 +426,4 @@ with PdfPages(d / "slides.pdf") as pdf:
         s.image(f_, 0.65, 1.2, 12, 5.7)
         s.save()
 
-print("->", d / "slides.pdf")
+print("->", d / "folien" / "slides.pdf")

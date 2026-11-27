@@ -10,7 +10,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 d = Path(sys.argv[1])
-sys.path.insert(0, str(d))
+sys.path.insert(0, str(d / "skripte"))
 import capex_opex as CO  # noqa: E402
 
 HK_FILL = {"direkt": "E3EEFB", "berechnet": "F1F1EF", "berechnet + Annahme": "FBE9DC"}
@@ -56,7 +56,7 @@ ws[f"A{ws.max_row}"].font = bold
 for k, v in HK_TEXT.items():
     ws.append([v])
     ws[f"A{ws.max_row}"].fill = PatternFill("solid", fgColor=HK_FILL[k])
-ws.append([    "Quellen: workshop/inputs/cable_system_design.yaml (Kabeldaten); Routen: workshop/cable-route/routes.json."])
+ws.append([    "Quellen: workshop/inputs/cable_system_design.yaml (Kabeldaten); Routen: workshop/cable-route/skripte/routes.json."])
 ws.append(["Verluste sind nicht in € bewertet: Im PyPSA-Modell stecken sie im Wirkungsgrad der Verbindung."])
 
 for col, w in zip("ABCDEFGH", [52, 10, 22, 24, 20, 12, 34, 90]):
@@ -69,7 +69,7 @@ ws.freeze_panes = "C5"
 # --- sheet 2: losses per route ---------------------------------------------------------------
 import json  # noqa: E402
 
-R = json.loads((d / "routes.json").read_text())
+R = json.loads((d / "skripte" / "routes.json").read_text())
 wl = wb.create_sheet("Verluste")
 wl["A1"] = "Netzverluste je Route (2 GW Bipol, 525 kV)"
 wl["A1"].font = Font(bold=True, size=13)
@@ -126,6 +126,6 @@ for row in wl.iter_rows(min_row=5, max_row=17):
     for c in row:
         c.alignment = Alignment(vertical="top", wrap_text=c.column_letter in "AG")
 wl.freeze_panes = "B5"
-out = d / "capex_opex.xlsx"
+out = d / "excel" / "capex_opex.xlsx"
 wb.save(out)
 print(f"-> {out}")
