@@ -1,39 +1,47 @@
-# Handoff to role 4: what is ready to analyse
+# Handoff to Role 4: trade and 2050 cable results
 
-Pull `mine/workshop-baseline`. Everything here is Germany-only unless noted.
+Pull `workshop-baseline` from `YAL-ESM/pypsa-eur-ki` for the tables.
 
-## Ready now
+## Ready to analyse
 
-- `workshop/trade/results_summary.csv` — one row per run and year that has a
-  solved network: demand, load-weighted and max price, emissions, renewable
-  share, net imports, system cost. Regenerate with
-  `pixi run python workshop/trade/summary_all_runs.py`.
-- `workshop/trade/comparison_baseline_vs_trade.csv` — island vs trade, all
-  horizons, with curtailment and load shedding.
-- `workshop/trade/caveat-2050.md` — why 2050 is not a safe basis for the cable
-  decision.
+- [`results_summary.csv`](results_summary.csv): all six horizons (2025–2050)
+  for `de10-myopic`, `de10-trade`, `de10-trade-v2` and `de10-trade-cable2050`.
+  The separate `de10-trade-cable` run only has 2025 and 2030, before the cable.
+- [`cable2050_comparison.csv`](cable2050_comparison.csv): annual system cost,
+  cable deliveries, and CO₂ cap shadow prices for the matched 2050 comparison.
+- [`comparison_baseline_vs_trade.csv`](comparison_baseline_vs_trade.csv):
+  island vs the original trade run, with curtailment and load shedding.
 
-Runs available: `de10-myopic` (2025-2050), `de10-trade` (2025-2050),
-`de10-trade-v2` (2025-2040; 2045/2050 were killed for memory and need a rerun).
+The summary CSV's `system_cost_bn_EUR` is the myopic objective; use the
+2050 comparison for annual total system costs, including inherited assets and
+the fixed cable. The summary CSV's net-import and emissions columns are
+generation-based proxies; use model accounting for physical cross-border
+flows or reported CO₂ totals.
 
-## Not ready yet
+## 2050 result
 
-- `de10-trade-v2` 2045/2050 and the cable run `de10-trade-cable` 2035-2050.
-- No cable flows or with/without-cable system cost yet.
+`de10-trade-v2` (no cable) and `de10-trade-cable2050` (fixed 2 GW cable from
+2050) use identical solved 2045 networks and 6-hour resolution in 2050. Both
+2050 solves terminated as optimal.
 
-## What the numbers already say
+The cable delivers **7.57 TWh/year** to Germany. Annual system cost rises
+from **€222.08bn** to **€227.06bn**: savings before paying for the cable are
+**€0.37bn/year**, against an annual cable cost of **€5.35bn**. Net benefit
+(without minus with) is **−€4.98bn/year** under this scenario's assumptions.
 
-- German load-weighted prices are 76-117 EUR/MWh in 2025-2045. The 2050 zero-CO2
-  cap pushes the max to 2,959 EUR/MWh (island) / 4,371 EUR/MWh (trade).
-- Role 1's 2,000 MW routes cost 68-72 bn EUR and lose 34-36% at full load.
-  Annualised at 3-4% WACC over 40 years, that is ~290-360 EUR/MWh delivered
-  before Brazilian generation. The cable only looks worthwhile against the 2050
-  cap artefact.
+The zero-CO₂ cap remains binding, with a shadow price of about €33,000/t in
+both cases. Treat this as a 2050 sensitivity under the current cap; see
+[`caveat-2050.md`](caveat-2050.md). No completed multi-horizon cable comparison
+is available yet.
 
-## Decisions role 4 needs to make early
+For the study design, decide whether to keep this 2050 case or test a revised
+cap, and whether to add a cable capacity-expansion case. Use a common discount
+rate and cost year when comparing scenarios.
 
-- Whether 2050 stays in the study, and whether the zero-CO2 cap is dropped or
-  fixed first.
-- Capacity expansion vs cost-benefit of a given cable (the cable config assumes
-  a given 2,000 MW link).
-- One harmonised discount rate and cost year for Germany, Brazil and the cable.
+```bash
+pixi run python workshop/trade/summary_all_runs.py
+pixi run python workshop/cable/evaluate_cable.py de10-trade-v2 de10-trade-cable2050 2050
+```
+
+These commands regenerate the summary and the underlying comparison in the
+workspace that has the solved networks and cable evaluation script.

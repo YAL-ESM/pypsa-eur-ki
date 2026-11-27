@@ -16,7 +16,13 @@ from pathlib import Path
 import pandas as pd
 import pypsa
 
-RUNS = ["de10-myopic", "de10-trade", "de10-trade-v2", "de10-trade-cable"]
+RUNS = [
+    "de10-myopic",
+    "de10-trade",
+    "de10-trade-v2",
+    "de10-trade-cable",
+    "de10-trade-cable2050",
+]
 YEARS = [2025, 2030, 2035, 2040, 2045, 2050]
 RENEWABLES = [
     "solar",
