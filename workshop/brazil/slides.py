@@ -29,7 +29,7 @@ from pptx.dml.color import RGBColor
 from pptx.util import Inches, Pt
 
 ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "workshop/plotstyle").is_dir())
-DECK = ROOT / "results/brazil/brazil_renewables.pptx"  # results/ is git-ignored
+DECK = ROOT / "workshop/slides/brazil_renewables.pptx"
 
 FONT = "Libre Franklin"  # falls back to the system sans if not installed
 TEXT, LABEL, FAINT = RGBColor(0x22, 0x22, 0x22), RGBColor(0x44, 0x44, 0x44), RGBColor(0xAA, 0xAA, 0xAA)

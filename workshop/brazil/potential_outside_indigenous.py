@@ -152,7 +152,7 @@ def main():
         ax.set_title(title, loc="left")
         for r in tops[tech].itertuples():
             ax.plot(r.lon, r.lat, "o", ms=5, mfc="white", mec=st.TEXT, mew=1.0, zorder=5)
-            ax.annotate(f"{r.rank}: {r.lat:.1f}°, {r.lon:.1f}°\n{r.GWh / 1e3:.1f} TWh/yr, CF {r.cf:.2f}",
+            ax.annotate(f"{r.rank}: {r.GWh / 1e3:.1f} TWh/yr, CF {r.cf:.2f}",
                         (r.lon, r.lat), xytext=(6, 4), textcoords="offset points", fontsize=6, color=st.TEXT,
                         zorder=6, bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.75))
         cax = ax.inset_axes([0.05, 0.05, 0.5, 0.025])
