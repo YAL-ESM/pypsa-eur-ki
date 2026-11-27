@@ -25,6 +25,7 @@ NREL 5.5 MW (fixed) / 5 MW (floating) offshore x 0.8855.
     pixi run python workshop/brazil/optimal_land_use.py      # writes land_twh_cell.npz
     pixi run python workshop/brazil/offshore_potential.py    # writes offshore_twh_cell.npz
     pixi run python workshop/brazil/firm_supply.py
+    pixi run python workshop/brazil/firm_supply.py --no-connection   # plants and battery only, files *_noconn.*
 
 Exact positions stay in results/ (git-ignored).
 """
@@ -49,6 +50,8 @@ st, DATA, OUT, CELL, ROOT = po.st, po.DATA, po.OUT, po.CELL, po.pe.ROOT
 FIRM_GW = 2.0
 RADIUS_KM = 150
 STEP_KM = 25
+CONNECTION = "--no-connection" not in sys.argv  # include the lines from the plants to the landing
+SUFFIX = "" if CONNECTION else "_noconn"
 WORKERS = 4  # each LP needs about 1 GB; the workspace limit is 10 GB
 COSTS = ROOT / "resources/de10-myopic/costs_2035_processed.csv"
 TECHS = ["onwind", "solar", "fixed", "floating"]
@@ -223,6 +226,9 @@ def main():
     line = {"land": costs.at["HVAC overhead", "capital_cost"] / 1e3,  # M EUR/GW/km/yr
             "sea": costs.at["offwind-ac-connection-submarine", "capital_cost"] / 1e3}
     station = costs.at["offwind-ac-station", "capital_cost"] / 1e3
+    if not CONNECTION:
+        line, station = {"land": 0.0, "sea": 0.0}, 0.0
+        print("Without connection costs: plants and battery only")
     is_off = opt.tech.isin(["fixed", "floating"]).values
     base = np.array([cc[t] for t in opt.tech])
     bat = {"E": costs.at["battery storage", "capital_cost"] / 1e3,  # M EUR/GWh/yr
@@ -248,7 +254,7 @@ def main():
                             "lcoe_firm": fun * 1e6 / (FIRM_GW * 1e3 * len(time))})  # EUR per MWh into the cable
             keep_out[i] = out
     res_df = coast.join(pd.DataFrame(results).set_index("i"), how="inner")
-    res_df.drop(columns=["px", "py"]).round(4).to_csv(OUT / "firm_supply_by_landing.csv", index=False)
+    res_df.drop(columns=["px", "py"]).round(4).to_csv(OUT / f"firm_supply_by_landing{SUFFIX}.csv", index=False)
     ok = res_df[res_df.feasible == True].sort_values("cost_M")  # noqa: E712
     print(f"\nFeasible landing points: {len(ok)} of {len(res_df)}")
     show = ["state", "lat", "lon", "cost_M", "lcoe_firm", "GW", "GW_onwind", "GW_solar", "GW_fixed", "GW_floating",
@@ -267,7 +273,7 @@ def main():
     plants = opt.assign(GW=cap, dist_km=dist[i])[cap > 0.005].sort_values("GW", ascending=False)
     print(f"\nBest landing: {best.state}, {best.lat:.2f}, {best.lon:.2f}")
     print(plants[["tech", "lat", "lon", "GW", "cf", "dist_km", "cap_max"]].round(2).to_string(index=False))
-    plants.drop(columns=["px", "py"]).round(4).to_csv(OUT / "firm_supply_plants.csv", index=False)
+    plants.drop(columns=["px", "py"]).round(4).to_csv(OUT / f"firm_supply_plants{SUFFIX}.csv", index=False)
     by_t = pd.DataFrame({t: cf[:, opt.tech.values == t] @ cap[opt.tech.values == t] for t in TECHS}, index=time)
     by_t["battery"] = sto["discharge"] - sto["charge"]
     # hourly time series of the best landing, GW (state of charge in GWh)
@@ -280,9 +286,9 @@ def main():
                        "into_cable_GW": np.minimum(plant - sto["charge"] + sto["discharge"], FIRM_GW),
                        "surplus_GW": np.maximum(plant - sto["charge"] + sto["discharge"] - FIRM_GW, 0)}, index=time)
     ts.index.name = "time"
-    ts.round(4).to_csv(OUT / "firm_supply_timeseries.csv")
-    print(f"saved {OUT / 'firm_supply_timeseries.csv'}:\n", ts.describe().loc[["mean", "min", "max"]].round(2).to_string())
-    by_t.to_csv(OUT / "firm_supply_hourly.csv")
+    ts.round(4).to_csv(OUT / f"firm_supply_timeseries{SUFFIX}.csv")
+    print(f"saved {OUT / f'firm_supply_timeseries{SUFFIX}.csv'}:\n", ts.describe().loc[["mean", "min", "max"]].round(2).to_string())
+    by_t.to_csv(OUT / f"firm_supply_hourly{SUFFIX}.csv")
     tot = by_t[TECHS].sum(axis=1)
     into = np.minimum(tot + by_t.battery, FIRM_GW * 10)
     print(f"Into the cable: min {into.min():.2f} GW (target {FIRM_GW}); battery covers {(by_t.battery > 1e-3).sum()} hours")
@@ -335,8 +341,8 @@ def main():
     ax2.set_xlabel("Hours")
     fig.suptitle(f"Steady 2 GW: cheapest plant mix within {RADIUS_KM} km of the cable landing ({best.state})",
                  x=0.01, ha="left", fontsize=10, fontweight="bold")
-    fig.savefig(OUT / "firm_supply.pdf")
-    fig.savefig(OUT / "firm_supply.png", dpi=300)
+    fig.savefig(OUT / f"firm_supply{SUFFIX}.pdf")
+    fig.savefig(OUT / f"firm_supply{SUFFIX}.png", dpi=300)
 
     # overview map: cost of a firm 2 GW at every landing point along the coast
     fig, ax = plt.subplots(figsize=(5.6, 5.6))
@@ -350,9 +356,9 @@ def main():
     st.map_axes(ax)
     ax.set_title("Cost of a steady 2 GW at each coast point, EUR/MWh", loc="left")
     st.colorbar(fig, sc, ax.inset_axes([0.05, 0.05, 0.5, 0.025]), "EUR per MWh into the cable (European costs)")
-    fig.savefig(OUT / "firm_supply_coast.pdf")
-    fig.savefig(OUT / "firm_supply_coast.png", dpi=300)
-    print("saved", OUT / "firm_supply.png", OUT / "firm_supply_coast.png")
+    fig.savefig(OUT / f"firm_supply_coast{SUFFIX}.pdf")
+    fig.savefig(OUT / f"firm_supply_coast{SUFFIX}.png", dpi=300)
+    print("saved", OUT / f"firm_supply{SUFFIX}.png", OUT / f"firm_supply_coast{SUFFIX}.png")
 
 
 if __name__ == "__main__":
