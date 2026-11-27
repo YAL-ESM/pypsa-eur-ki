@@ -130,6 +130,11 @@ def main():
           f"only PV {km2[ok_s & ~ok_w].sum() / 1e3:,.0f}")
     print(f"On the land open to both, wind wins on {km2[both & use_w].sum() / 1e3:,.0f} thousand km2, "
           f"PV on {km2[both & use_s].sum() / 1e3:,.0f}")
+    np.savez(OUT / "land_twh_cell.npz", x=x, y=y, onwind=twh["onwind"], solar=twh["solar"],
+             onwind_GW=gw["onwind"], solar_GW=gw["solar"],
+             # each technology alone on its own land, and the land open to either (km2), for firm_supply.py
+             onwind_alone_GW=per_cell(ok_w, km2) * MW["onwind"] / 1e3, solar_alone_GW=per_cell(ok_s, km2) * MW["solar"] / 1e3,
+             land_km2=per_cell(ok_w | ok_s, km2))
     tot = {t: twh[t].sum() for t in twh}
     print("\nBest mix, whole Brazil outside all protected areas:")
     for t in twh:
