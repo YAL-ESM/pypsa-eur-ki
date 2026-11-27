@@ -1,0 +1,13 @@
+metric,unit,de10-trade-cable2050,de10-trade-cable-fast
+annual_system_cost_without_cable,bn EUR/year,222.08,222.08
+annual_system_cost_with_cable,bn EUR/year,227.06,226.93
+net_benefit,bn EUR/year,-4.98,-4.85
+gross_benefit_before_cable_cost,bn EUR/year,0.37,0.50
+annual_cable_cost,bn EUR/year,5.35,5.35
+cable_delivery_to_germany,TWh/year,7.57,8.23
+cable_losses,TWh/year,3.09,3.56
+cable_utilisation,%,60.89,67.25
+delivered_electricity_market_value,EUR/MWh,102.21,106.62
+break_even_cable_investment,bn EUR,4.77,6.42
+co2_cap_shadow_price_without_cable,EUR/t,33036.20,33036.20
+co2_cap_shadow_price_with_cable,EUR/t,33487.26,33466.32
