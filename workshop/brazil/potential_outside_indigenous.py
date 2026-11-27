@@ -9,9 +9,19 @@ aggregated to the 0.3 deg cells of the ERA5 cutout and multiplied with the mean 
 of each cell (atlite, same turbine and panel as PyPSA-Eur; PV tilted towards the equator) and with
 PyPSA-Eur's installable capacity per km2. Result: annual generation potential per cell and state.
 
+Two adjustments on top of PyPSA-Eur's defaults (both are assumptions, set below, and printed against the
+unadjusted value):
+  wake loss:  onshore wind output is multiplied by 1 - WAKE_LOSS. atlite gives the capacity factor of a single
+              turbine; at 3 MW/km2 (about 9 rotor diameters apart) turbines shade each other. 10 % is a typical
+              onshore park value (literature range roughly 8-15 %); no wake model is run.
+  slope:      land steeper than MAX_SLOPE_DEG is excluded (wind 15, solar PV 5 degrees). The slope comes from
+              GEBCO (15 arcsec, about 460 m), which smooths the terrain, so real slopes are steeper: the
+              exclusion is a lower bound.
+
 Scenarios (what is excluded on top of land cover):
   outside indigenous: only indigenous areas (WDPA "Indigenous Area" / "Indigenous Reserve")
   no protected area:  every WDPA polygon, indigenous areas included (the PyPSA-Eur default)
+  all land:           no protected-area exclusion at all, the reference for what each exclusion costs
 
     pixi run python workshop/brazil/potential_outside_indigenous.py
 """
@@ -39,6 +49,8 @@ DATA = ROOT / "data-brazil"
 OUT = ROOT / "results/brazil"
 MW_PER_KM2 = {"onwind": 3.0, "solar": 5.1}  # config.default.yaml, renewable.<tech>.capacity_per_sqkm
 CELL = 0.3
+WAKE_LOSS = {"onwind": 0.10, "solar": 0.0}  # share of the single-turbine output lost to wakes; PV has none
+MAX_SLOPE_DEG = {"onwind": 15.0, "solar": 5.0}  # land above this slope is not built on
 
 
 def cutout_cf():
@@ -46,6 +58,19 @@ def cutout_cf():
     wind = cutout.wind(turbine="Vestas_V112_3MW", capacity_factor=True, add_cutout_windspeed=True)
     pv = cutout.pv(panel="CSi", orientation="latitude_optimal", capacity_factor=True)
     return cutout, wind.load(), pv.load()
+
+
+def slope_deg():
+    """Terrain slope in degrees on the 0.01 deg grid, from GEBCO elevation (15 arcsec)."""
+    el = xr.open_dataset(DATA / "layers/gebco_brazil.nc")["elevation"].astype("float32")
+    lat = el.lat.values
+    step = abs(float(el.lat[1] - el.lat[0]))
+    dy = step * 110574.0
+    dx = step * 111320.0 * np.cos(np.deg2rad(lat))[:, None]
+    gy, gx = np.gradient(el.values, dy, axis=0), np.gradient(el.values, axis=1) / dx
+    slope = xr.DataArray(np.degrees(np.arctan(np.hypot(gx, gy))).astype("float32"), coords=el.coords, dims=el.dims)
+    del el, gx, gy
+    return slope.sel(lat=xr.DataArray(pe.LAT, dims="y"), lon=xr.DataArray(pe.LON, dims="x"), method="nearest").values
 
 
 def main():
@@ -65,8 +90,10 @@ def main():
 
     urban_buffer = binary_dilation(lc == pe.URBAN, iterations=pe.URBAN_DISTANCE_PX)
     km2 = (pe.RES * 111.32) ** 2 * np.cos(np.deg2rad(pe.LAT))[:, None] * np.ones((1, pe.NX))
-    scenarios = {"outside indigenous": brazil & ~indigenous, "no protected area": brazil & ~protected}
+    scenarios = {"outside indigenous": brazil & ~indigenous, "no protected area": brazil & ~protected,
+                 "all land": brazil}
 
+    slope = slope_deg()
     cutout, wind_cf, pv_cf = cutout_cf()
     cf = {"onwind": wind_cf, "solar": pv_cf}
     x, y = cutout.data.x.values, cutout.data.y.values
@@ -84,12 +111,19 @@ def main():
             if tech == "onwind":
                 ok &= ~urban_buffer
             ok &= inside
+            flat = ok.copy()  # before the slope exclusion, for the comparison
+            ok &= slope <= MAX_SLOPE_DEG[tech]
+            net = 1 - WAKE_LOSS[tech]
             area = np.bincount(cell[ok], weights=km2[ok], minlength=len(x) * len(y)).reshape(len(y), len(x))
-            gwh = area * MW_PER_KM2[tech] * cf[tech].values * 8.76  # MW * CF * 8760 h / 1000 = GWh
+            gwh = area * MW_PER_KM2[tech] * cf[tech].values * 8.76 * net  # MW * CF * 8760 h / 1000 = GWh
             cells[(scen, tech)] = (area, gwh)
+            raw = (km2[flat] * MW_PER_KM2[tech] * cf[tech].values.ravel()[cell[flat]] * 8.76).sum() / 1e3
+            print(f"{scen:>20} {tech:>6}: unadjusted {raw:7,.0f} TWh/yr -> slope <= {MAX_SLOPE_DEG[tech]:.0f} deg, "
+                  f"wake loss {WAKE_LOSS[tech]:.0%}: {gwh.sum() / 1e3:7,.0f} TWh/yr  "
+                  f"(area {km2[flat].sum() / 1e3:,.0f} -> {area.sum() / 1e3:,.0f} thousand km2)")
             # state of each cell = state holding most of its eligible area, for the tables use pixels directly
             sid = state_id[ok]
-            pix_gwh = km2[ok] * MW_PER_KM2[tech] * cf[tech].values.ravel()[cell[ok]] * 8.76
+            pix_gwh = km2[ok] * MW_PER_KM2[tech] * cf[tech].values.ravel()[cell[ok]] * 8.76 * net
             by_state = pd.Series(pix_gwh).groupby(sid).sum() / 1e3  # TWh
             by_area = pd.Series(km2[ok]).groupby(sid).sum() / 1e3
             for i, uf in enumerate(states.uf, 1):
