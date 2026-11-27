@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Role 4: the Brazil export site and the HVDC cable, as a layer on the base run.
+# Layer it last, after the base (trade) config, so it takes effect:
+#
+#   pixi run snakemake results/de10-brazil/networks/solved_2050.nc -c4 \
+#     --configfile config/config.workshop.yaml config/config.trade.yaml \
+#     config/config.brazil-cable.yaml --forcerun compose_network
+#
+# Fixed-capacity cost-benefit study of a given cable (no capacity expansion).
+# Costs consolidated in real 2025 EUR, annualised at 7%; the study discount rate
+# is applied in post-processing, not in the model.
+#
+# Brazilian assets use role 2's variant A ("with connections", onshore-wind mix),
+# workshop/brazil/costs_firm_supply.txt, up to the landing point. Note: role 2's
+# firm_supply_timeseries_noconn.csv is variant B (offshore-wind mix) and does not
+# match the variant A capacities below - use the with-connection timeseries here.
+
+run:
+  name: de10-brazil
+
+brazil_cable:
+  enabled: true
+  route: cost_Macau          # A · cost_Macau (cost-minimal); B = shallow, C = minabyss
+  landing_bus: DE0 8AC        # German node 08, North
+  brazil:
+    bus: BR0 0AC
+    x: -36.4517               # role 2's landing: RN, Macau / Guamaré
+    y: -5.0667
+    timeseries: workshop/brazil/timeseries/firm_supply_timeseries.csv
+    # role 2 variant A: solar + onshore wind + battery, 2 GW firm in every hour.
+    # Costs are the model's 2025 cost data (real 2025 EUR, annualised at 7%),
+    # not role 2's original 2035 figures, so the whole study sits on one basis.
+    generators:
+      solar:  {p_nom: 8680, capital_cost: 58293}    # MW, EUR/MW/yr (2025; 2035 was 44.3 EUR/kW/yr)
+      onwind: {p_nom: 3470, capital_cost: 135624}   # MW, EUR/MW/yr (2025; 2035 was 124.5 EUR/kW/yr)
+    battery:
+      power_mw: 3200
+      energy_mwh: 30000
+      storage_cost: 22387       # EUR/MWh/yr (2025; 2035 was 13.1 EUR/kWh/yr)
+      inverter_cost: 41651      # EUR/MW/yr (2025; 2035 was 25.5 EUR/kW/yr)
+      inverter_efficiency: 0.96
+    connection_cost: 38000000   # EUR/yr, plants to the landing (role 2 variant A, 2035 basis)
+  cable:
+    p_nom: 2000               # MW, 2 GW bipole
+    # discount_rate: 0.07     # default: the model's own rate, so the cable is
+    #                         # annualised like every other asset (fair comparison)

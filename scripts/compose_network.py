@@ -17,6 +17,7 @@ from scripts._helpers import (
     sanitize_custom_columns,
     set_scenario_config,
 )
+from scripts.add_brazil_cable import add_brazil_cable
 from scripts.add_brownfield import adjust_renewable_capacity_limits
 from scripts.add_brownfield import main as apply_brownfield
 from scripts.add_electricity import main as add_electricity_components
@@ -142,6 +143,8 @@ if __name__ == "__main__":
     ):
         logger.info(f"No investment in first horizon {current_horizon}")
         freeze_expansion(n)
+
+    add_brazil_cable(n, snakemake.config, costs)
 
     sanitize_custom_columns(n)
     sanitize_carriers(n, params.nice_names, params.tech_colors)
